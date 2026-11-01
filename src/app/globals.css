@@ -92,33 +92,25 @@
 
 @keyframes categoriesSlideLTR {
   0% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
   100% {
-    transform: translateX(0%);
+    transform: translate3d(0%, 0, 0);
   }
 }
 
 .animate-categories-rtl {
   display: flex;
   width: max-content;
-  animation: categoriesSlideRTL 45s linear infinite;
+  animation: categoriesSlideRTL 60s linear infinite;
   will-change: transform;
-}
-
-.animate-categories-rtl:hover {
-  animation-play-state: paused;
 }
 
 .animate-categories-ltr {
   display: flex;
   width: max-content;
-  animation: categoriesSlideLTR 45s linear infinite;
+  animation: categoriesSlideLTR 60s linear infinite;
   will-change: transform;
-}
-
-.animate-categories-ltr:hover {
-  animation-play-state: paused;
 }
 
 /* Luxury animations and transitions */
