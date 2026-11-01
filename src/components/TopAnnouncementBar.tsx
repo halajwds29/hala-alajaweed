@@ -13,19 +13,19 @@ interface TopAnnouncementBarProps {
 
 export default function TopAnnouncementBar({
   announcement = 'مؤسسة حلا الأجاويد للحلويات — فخر الضيافة السعودية الأصيلة | حائل (المقر الرئيسي) • الرياض (خدمة وتوريد) | شحن وتوصيل لكافة مدن ومناطق المملكة',
-  speed = 25,
+  speed = 30,
   enabled = true,
   phone = '0546002435',
 }: TopAnnouncementBarProps) {
   if (!enabled) return null;
 
-  const validSpeed = Math.max(5, Math.min(120, speed || 25));
+  const validSpeed = Math.max(10, Math.min(120, speed || 30));
 
-  // The identical segment to repeat for 100% gapless continuous marquee
-  const AnnouncementGroup = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
-    <div className="flex shrink-0 items-center gap-4 sm:gap-6 pl-4 sm:pl-6" aria-hidden={ariaHidden}>
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-pulse" />
+  // Single announcement unit
+  const AnnouncementUnit = () => (
+    <div className="flex items-center gap-4 sm:gap-6 px-3 sm:px-6 shrink-0 whitespace-nowrap">
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-pulse shrink-0" />
         <span className="font-medium text-[#FAF6F0]">{announcement}</span>
       </div>
       <span className="text-[#C5A059] font-bold shrink-0">•</span>
@@ -36,19 +36,30 @@ export default function TopAnnouncementBar({
       <span className="text-[#C5A059] font-bold shrink-0">•</span>
       <span className="text-[#F7F1E9]/80 text-[9px] sm:text-[10px] shrink-0">نكهات أصيلة ولمسات عصرية</span>
       <span className="text-[#C5A059] font-bold shrink-0">•</span>
+      <span className="text-[#F7F1E9]/80 text-[9px] sm:text-[10px] shrink-0">شحن وتوصيل لكافة مدن المملكة</span>
+      <span className="text-[#C5A059] font-bold shrink-0">•</span>
+    </div>
+  );
+
+  // Group of units that repeats seamlessly without any empty gaps
+  const AnnouncementGroup = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
+    <div className="flex shrink-0 items-center" aria-hidden={ariaHidden}>
+      <AnnouncementUnit />
+      <AnnouncementUnit />
     </div>
   );
 
   return (
     <div className="bg-[#4A1D2E] text-[#F7F1E9] text-[10px] sm:text-[11px] py-1.5 sm:py-2 border-b border-[#C5A059]/20 relative z-30 shadow-2xs overflow-hidden w-full max-w-full">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 flex items-center justify-between gap-4 w-full overflow-hidden">
-        {/* Animated Continuous Marquee: Moves on ALL devices (Mobile + Tablet + Desktop) */}
+        {/* Continuous 100% Gapless Marquee: Content is always present and seamlessly follows itself */}
         <div
+          dir="ltr"
           className="relative flex-1 min-w-0 overflow-hidden"
           style={{ contain: 'paint layout' }}
         >
           <div
-            className="animate-marquee-rtl flex items-center select-none"
+            className="animate-marquee-continuous flex items-center select-none"
             style={{ animationDuration: `${validSpeed}s` }}
           >
             <AnnouncementGroup />

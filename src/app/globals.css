@@ -80,23 +80,24 @@
   background: #682D43;
 }
 
-@keyframes marqueeRTL {
+@keyframes marqueeContinuous {
   0% {
-    transform: translateX(0%);
+    transform: translate3d(0%, 0, 0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
-.animate-marquee-rtl {
+.animate-marquee-continuous {
   display: flex;
   width: max-content;
-  animation: marqueeRTL 25s linear infinite;
+  animation: marqueeContinuous 30s linear infinite;
   will-change: transform;
 }
 
-.animate-marquee-rtl:hover {
+.animate-marquee-continuous:hover,
+.animate-marquee-continuous:active {
   animation-play-state: paused;
 }
 
