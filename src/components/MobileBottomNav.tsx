@@ -35,7 +35,7 @@ export default function MobileBottomNav({ whatsappNumber = '+966546002435' }: Mo
   return (
     <nav
       aria-label="شريط التنقل السفلي للجوال"
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF6F0]/95 backdrop-blur-lg border-t border-[#EBE3D7] px-3 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF6F0]/95 backdrop-blur-lg border-t border-[#EBE3D7] px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
     >
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {

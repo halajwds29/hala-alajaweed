@@ -26,15 +26,15 @@ export default function MainLayoutWrapper({ children, settings }: MainLayoutWrap
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-16 lg:pb-0 print:pb-0 print:min-h-0 print:block w-full max-w-full min-w-0 overflow-x-hidden">
-      <div className="no-print print:hidden w-full max-w-full min-w-0 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen pb-20 lg:pb-0 print:pb-0 print:min-h-0 print:block w-full max-w-full min-w-0" style={{ overflowX: 'clip' }}>
+      <div className="no-print print:hidden w-full max-w-full min-w-0" style={{ overflowX: 'clip' }}>
         <Suspense fallback={null}>
           <RouteProgressBar />
         </Suspense>
         <Header settings={settings} />
       </div>
-      <main className="flex-1 w-full max-w-full min-w-0 overflow-x-hidden print:p-0 print:m-0 print:w-full">{children}</main>
-      <div className="no-print print:hidden w-full max-w-full min-w-0 overflow-x-hidden">
+      <main className="flex-1 w-full max-w-full min-w-0 print:p-0 print:m-0 print:w-full" style={{ overflowX: 'clip' }}>{children}</main>
+      <div className="no-print print:hidden w-full max-w-full min-w-0" style={{ overflowX: 'clip' }}>
         <Footer settings={settings} />
         <CartDrawer />
         <FloatingWhatsApp phoneNumber={settings?.whatsapp || settings?.phone} />

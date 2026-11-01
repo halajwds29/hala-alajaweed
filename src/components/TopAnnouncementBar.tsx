@@ -40,10 +40,19 @@ export default function TopAnnouncementBar({
   );
 
   return (
-    <div className="bg-[#4A1D2E] text-[#F7F1E9] text-[11px] py-2 border-b border-[#C5A059]/20 relative z-30 shadow-2xs overflow-hidden w-full max-w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 w-full overflow-hidden">
+    <div className="bg-[#4A1D2E] text-[#F7F1E9] text-[11px] py-1.5 sm:py-2 border-b border-[#C5A059]/20 relative z-30 shadow-2xs overflow-hidden w-full max-w-full">
+      {/* Mobile: 100% bounded single line announcement with zero overflow */}
+      <div className="flex sm:hidden items-center justify-center px-3 text-center w-full">
+        <div className="flex items-center gap-1.5 max-w-full truncate text-[10px] font-medium text-[#FAF6F0]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-pulse shrink-0" />
+          <span className="truncate">{announcement}</span>
+        </div>
+      </div>
+
+      {/* Tablet & Desktop: Rich Continuous Marquee */}
+      <div className="hidden sm:flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center justify-between gap-4 w-full overflow-hidden">
         {/* Animated Marquee Container */}
-        <div className="relative flex-1 min-w-0 overflow-hidden mask-gradient-x">
+        <div className="relative flex-1 min-w-0 overflow-hidden mask-gradient-x" style={{ contain: 'paint layout' }}>
           <div
             className="animate-marquee-rtl flex items-center"
             style={{ animationDuration: `${validSpeed}s` }}
@@ -51,12 +60,11 @@ export default function TopAnnouncementBar({
             <AnnouncementItem />
             <AnnouncementItem />
             <AnnouncementItem />
-            <AnnouncementItem />
           </div>
         </div>
 
         {/* Static Action Links (Pinned on the Left in RTL for immediate access) */}
-        <div className="hidden sm:flex items-center gap-4 text-[11px] text-[#F7F1E9]/90 shrink-0 bg-[#4A1D2E] pl-2 z-10 border-r border-white/10 pr-4">
+        <div className="flex items-center gap-4 text-[11px] text-[#F7F1E9]/90 shrink-0 bg-[#4A1D2E] pl-2 z-10 border-r border-white/10 pr-4">
           <Link
             href="/track-order"
             className="hover:text-[#C5A059] inline-flex items-center gap-1.5 transition-colors duration-200"

@@ -22,9 +22,9 @@ export default function Logo({
 
   // Sizing definitions for the official emblem & typography
   const defaultHeightClass = {
-    sm: 'h-10 w-auto',
-    md: 'h-14 sm:h-16 w-auto',
-    lg: 'h-16 sm:h-20 w-auto',
+    sm: 'h-9 sm:h-10 w-auto max-w-[100px] sm:max-w-none',
+    md: 'h-12 sm:h-16 w-auto',
+    lg: 'h-14 sm:h-20 w-auto',
   }[size];
 
   const dynamicStyle = customHeight

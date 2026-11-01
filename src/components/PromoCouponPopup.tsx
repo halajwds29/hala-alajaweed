@@ -30,7 +30,14 @@ export default function PromoCouponPopup() {
         if (data.success && data.promo && data.promo.enabled !== false) {
           setPromo(data.promo);
           if (!isDismissed) {
-            // Trigger appearance after 2.5 seconds
+            // On mobile phones (< 640px), keep it minimized as a subtle pill to avoid blocking the viewport
+            const isMobile = window.innerWidth < 640;
+            if (isMobile) {
+              setMinimized(true);
+              return;
+            }
+
+            // On larger screens, trigger appearance after 2.5 seconds
             const timer = setTimeout(() => {
               setVisible(true);
             }, 2500);

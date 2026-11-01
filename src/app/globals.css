@@ -28,11 +28,13 @@
 
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     max-width: 100% !important;
     width: 100% !important;
     margin: 0;
     padding: 0;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
@@ -42,12 +44,15 @@
     direction: rtl;
     text-align: right;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     max-width: 100% !important;
     width: 100% !important;
     margin: 0;
     padding: 0;
     position: relative;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    touch-action: manipulation;
   }
 
   a {

@@ -115,7 +115,7 @@ export default async function HomePage() {
       </section>
 
       {/* 2. Categories Section: Slow Smooth Marquee Animation from Right to Left */}
-      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24 w-full max-w-full min-w-0 overflow-hidden">
+      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24 w-full max-w-full min-w-0" style={{ overflowX: 'clip' }}>
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-4 sm:mb-6 md:mb-8 border-b border-[#EBE3D7] pb-3 sm:pb-4">
           <div>
             <span className="text-[11px] sm:text-xs font-semibold text-[#9F6A76] tracking-widest uppercase">
