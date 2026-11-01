@@ -33,7 +33,7 @@ export default async function HomePage() {
     <div className="flex flex-col gap-10 sm:gap-16 md:gap-24 pb-20 w-full max-w-full min-w-0 overflow-x-hidden">
       {/* 1. Hero Section: Editorial Luxury on Warm Ivory */}
       <section className="relative overflow-hidden bg-[#FAF6F0] pt-4 sm:pt-8 md:pt-16 pb-8 sm:pb-12 md:pb-20 border-b border-[#EBE3D7] w-full max-w-full min-w-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 lg:gap-14 items-center">
             {/* Editorial Copy */}
             <div className="lg:col-span-6 space-y-4 sm:space-y-6 text-center lg:text-right">
@@ -115,7 +115,7 @@ export default async function HomePage() {
       </section>
 
       {/* 2. Categories Section: Slow Smooth Marquee Animation from Right to Left */}
-      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24 w-full max-w-full min-w-0" style={{ overflowX: 'clip' }}>
+      <section id="categories" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 scroll-mt-24 w-full max-w-full min-w-0" style={{ overflowX: 'hidden' }}>
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-4 sm:mb-6 md:mb-8 border-b border-[#EBE3D7] pb-3 sm:pb-4">
           <div>
             <span className="text-[11px] sm:text-xs font-semibold text-[#9F6A76] tracking-widest uppercase">
@@ -135,7 +135,7 @@ export default async function HomePage() {
       </section>
 
       {/* 3. Featured Products Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
+      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-6 md:mb-12 border-b border-[#EBE3D7] pb-3 sm:pb-4">
           <div>
             <span className="text-[11px] sm:text-xs font-semibold text-[#9F6A76] tracking-widest uppercase">
@@ -156,7 +156,7 @@ export default async function HomePage() {
         </div>
 
         {/* 2-columns on mobile, 4-columns on desktop */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 w-full max-w-full min-w-0">
           {(featuredProducts.length > 0 ? featuredProducts : allProducts.slice(0, 8)).map(
             (product) => (
               <ProductCard key={product._id} product={product} />
@@ -166,7 +166,7 @@ export default async function HomePage() {
       </section>
 
       {/* 4. Brand Story: Editorial Luxury Feature */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
+      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
         <div className="bg-[#FAF6F0] rounded-3xl border border-[#EBE3D7] overflow-hidden p-5 sm:p-10 lg:p-14">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
             {/* Story Text */}
@@ -221,7 +221,7 @@ export default async function HomePage() {
       </section>
 
       {/* 5. Wholesale & B2B Section: Minimalist Invitation */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
+      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
         <div className="bg-white rounded-3xl border border-[#EBE3D7] p-6 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 shadow-xs">
           <div className="max-w-xl space-y-2 text-center md:text-right">
             <span className="text-[11px] sm:text-xs font-semibold text-[#9F6A76] tracking-widest uppercase">
@@ -256,7 +256,7 @@ export default async function HomePage() {
       </section>
 
       {/* 6. Headquarters & National Address Locations */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
+      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
         <div className="border-t border-[#EBE3D7] pt-8 sm:pt-12">
           <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
             <span className="text-[11px] sm:text-xs font-semibold text-[#9F6A76] tracking-widest uppercase">

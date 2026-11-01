@@ -36,7 +36,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryProducts = allProducts.filter((p) => p.categorySlug === slug);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8 w-full max-w-full min-w-0">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-xs text-[#9F6A76]">
         <Link href="/" className="hover:text-[#682D43]">

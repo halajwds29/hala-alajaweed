@@ -67,7 +67,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-12 w-full max-w-full min-w-0">
       {/* Schema.org JSON-LD */}
       <script
         type="application/ld+json"
@@ -108,7 +108,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               عرض المزيد من هذا القسم
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 w-full max-w-full min-w-0">
             {related.map((rel) => (
               <ProductCard key={rel.slug} product={rel} />
             ))}

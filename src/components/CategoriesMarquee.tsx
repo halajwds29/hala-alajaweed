@@ -64,13 +64,13 @@ export default function CategoriesMarquee({ categories }: CategoriesMarqueeProps
   };
 
   return (
-    <div className="relative w-full max-w-full min-w-0" style={{ contain: 'paint layout', overflowX: 'clip' }}>
+    <div className="relative w-full max-w-full min-w-0" style={{ contain: 'paint layout', overflowX: 'hidden' }}>
       {/* Visual edge gradient masks for luxury fade */}
       <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-16 z-10 pointer-events-none bg-gradient-to-l from-[#FAF6F0] to-transparent" />
       <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-16 z-10 pointer-events-none bg-gradient-to-r from-[#FAF6F0] to-transparent" />
 
       {/* Infinite Marquee Track: NEVER STOPS, NEVER EMPTIES, NEVER OVERFLOWS */}
-      <div dir="ltr" className="py-2 sm:py-3 w-full max-w-full min-w-0" style={{ overflowX: 'clip' }}>
+      <div dir="ltr" className="py-2 sm:py-3 w-full max-w-full min-w-0" style={{ overflowX: 'hidden' }}>
         <div className="animate-categories-ltr flex shrink-0">
           {/* Primary Infinite Track Group */}
           <div className="flex shrink-0 items-center gap-2.5 sm:gap-4 pl-2.5 sm:pl-4">

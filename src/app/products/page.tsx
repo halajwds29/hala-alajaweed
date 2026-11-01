@@ -18,9 +18,9 @@ export default async function ProductsPage() {
   ]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 w-full max-w-full min-w-0">
       {/* Page Header */}
-      <div className="text-center max-w-3xl mx-auto mb-10 space-y-2">
+      <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10 space-y-2">
         <h1 className="text-3xl sm:text-4xl font-black text-[#4A1D2E]">
           قائمة منتجات حلا الأجاويد
         </h1>

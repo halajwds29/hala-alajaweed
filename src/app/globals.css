@@ -28,7 +28,7 @@
 
   html {
     scroll-behavior: smooth;
-    overflow-x: clip !important;
+    overflow-x: hidden !important;
     max-width: 100% !important;
     width: 100% !important;
     margin: 0;
@@ -44,7 +44,7 @@
     direction: rtl;
     text-align: right;
     -webkit-font-smoothing: antialiased;
-    overflow-x: clip !important;
+    overflow-x: hidden !important;
     max-width: 100% !important;
     width: 100% !important;
     margin: 0;
