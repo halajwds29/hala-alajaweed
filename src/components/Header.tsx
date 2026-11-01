@@ -96,17 +96,11 @@ export default function Header({ settings }: HeaderProps) {
           </button>
         </div>
 
-        {/* CENTERED LOGO: Both Desktop & Mobile */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center z-10 max-w-[120px] sm:max-w-none pointer-events-none">
-          <Logo
-            size="sm"
-            className="pointer-events-auto sm:hidden max-h-10 w-auto"
-            customSrc={settings?.logoUrl}
-            customHeight={settings?.logoHeight ? Math.min(settings.logoHeight, 44) : 40}
-          />
+        {/* CENTERED LOGO: Single responsive element */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center z-10 pointer-events-none">
           <Logo
             size="md"
-            className="pointer-events-auto hidden sm:inline-flex max-h-16 w-auto"
+            className="pointer-events-auto max-h-10 sm:max-h-16 w-auto"
             customSrc={settings?.logoUrl}
             customHeight={settings?.logoHeight}
           />
