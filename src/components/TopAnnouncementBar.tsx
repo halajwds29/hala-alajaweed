@@ -21,50 +21,43 @@ export default function TopAnnouncementBar({
 
   const validSpeed = Math.max(5, Math.min(120, speed || 25));
 
-  // The segment to repeat
-  const AnnouncementItem = () => (
-    <div className="flex items-center gap-6 px-4 shrink-0 whitespace-nowrap">
-      <div className="flex items-center gap-2">
+  // The identical segment to repeat for 100% gapless continuous marquee
+  const AnnouncementGroup = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
+    <div className="flex shrink-0 items-center gap-4 sm:gap-6 pl-4 sm:pl-6" aria-hidden={ariaHidden}>
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-pulse" />
         <span className="font-medium text-[#FAF6F0]">{announcement}</span>
       </div>
-      <span className="text-[#C5A059] font-bold">•</span>
-      <div className="flex items-center gap-1.5 text-[#F7F1E9]/80 text-[10px]">
+      <span className="text-[#C5A059] font-bold shrink-0">•</span>
+      <div className="flex items-center gap-1.5 text-[#F7F1E9]/80 text-[9px] sm:text-[10px] shrink-0">
         <MapPin className="w-3 h-3 text-[#C5A059]" />
         <span>المقر والمصنع الرئيسي — حائل</span>
       </div>
-      <span className="text-[#C5A059] font-bold">•</span>
-      <span className="text-[#F7F1E9]/80 text-[10px]">نكهات أصيلة ولمسات عصرية</span>
-      <span className="text-[#C5A059] font-bold">•</span>
+      <span className="text-[#C5A059] font-bold shrink-0">•</span>
+      <span className="text-[#F7F1E9]/80 text-[9px] sm:text-[10px] shrink-0">نكهات أصيلة ولمسات عصرية</span>
+      <span className="text-[#C5A059] font-bold shrink-0">•</span>
     </div>
   );
 
   return (
-    <div className="bg-[#4A1D2E] text-[#F7F1E9] text-[11px] py-1.5 sm:py-2 border-b border-[#C5A059]/20 relative z-30 shadow-2xs overflow-hidden w-full max-w-full">
-      {/* Mobile: 100% bounded single line announcement with zero overflow */}
-      <div className="flex sm:hidden items-center justify-center px-3 text-center w-full">
-        <div className="flex items-center gap-1.5 max-w-full truncate text-[10px] font-medium text-[#FAF6F0]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-pulse shrink-0" />
-          <span className="truncate">{announcement}</span>
-        </div>
-      </div>
-
-      {/* Tablet & Desktop: Rich Continuous Marquee */}
-      <div className="hidden sm:flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center justify-between gap-4 w-full overflow-hidden">
-        {/* Animated Marquee Container */}
-        <div className="relative flex-1 min-w-0 overflow-hidden mask-gradient-x" style={{ contain: 'paint layout' }}>
+    <div className="bg-[#4A1D2E] text-[#F7F1E9] text-[10px] sm:text-[11px] py-1.5 sm:py-2 border-b border-[#C5A059]/20 relative z-30 shadow-2xs overflow-hidden w-full max-w-full">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 flex items-center justify-between gap-4 w-full overflow-hidden">
+        {/* Animated Continuous Marquee: Moves on ALL devices (Mobile + Tablet + Desktop) */}
+        <div
+          className="relative flex-1 min-w-0 overflow-hidden"
+          style={{ contain: 'paint layout' }}
+        >
           <div
-            className="animate-marquee-rtl flex items-center"
+            className="animate-marquee-rtl flex items-center select-none"
             style={{ animationDuration: `${validSpeed}s` }}
           >
-            <AnnouncementItem />
-            <AnnouncementItem />
-            <AnnouncementItem />
+            <AnnouncementGroup />
+            <AnnouncementGroup ariaHidden />
           </div>
         </div>
 
-        {/* Static Action Links (Pinned on the Left in RTL for immediate access) */}
-        <div className="flex items-center gap-4 text-[11px] text-[#F7F1E9]/90 shrink-0 bg-[#4A1D2E] pl-2 z-10 border-r border-white/10 pr-4">
+        {/* Static Action Links (Tablet & Desktop only) */}
+        <div className="hidden sm:flex items-center gap-4 text-[11px] text-[#F7F1E9]/90 shrink-0 bg-[#4A1D2E] pl-2 z-10 border-r border-white/10 pr-4">
           <Link
             href="/track-order"
             className="hover:text-[#C5A059] inline-flex items-center gap-1.5 transition-colors duration-200"
