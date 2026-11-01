@@ -97,8 +97,8 @@ export default function Header({ settings }: HeaderProps) {
         </div>
 
         {/* CENTERED LOGO: Both Desktop & Mobile */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center z-10">
-          <Logo size="md" customSrc={settings?.logoUrl} customHeight={settings?.logoHeight} />
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center z-10 max-w-[140px] sm:max-w-none pointer-events-none">
+          <Logo size="md" className="pointer-events-auto max-h-12 sm:max-h-16 w-auto" customSrc={settings?.logoUrl} customHeight={settings?.logoHeight} />
         </div>
 
         {/* Desktop Left Links & Actions (RTL end) */}

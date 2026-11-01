@@ -40,10 +40,10 @@ export default function TopAnnouncementBar({
   );
 
   return (
-    <div className="bg-[#4A1D2E] text-[#F7F1E9] text-[11px] py-2 border-b border-[#C5A059]/20 relative z-30 shadow-2xs overflow-hidden group">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+    <div className="bg-[#4A1D2E] text-[#F7F1E9] text-[11px] py-2 border-b border-[#C5A059]/20 relative z-30 shadow-2xs overflow-hidden w-full max-w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 w-full overflow-hidden">
         {/* Animated Marquee Container */}
-        <div className="relative flex-1 overflow-hidden mask-gradient-x">
+        <div className="relative flex-1 min-w-0 overflow-hidden mask-gradient-x">
           <div
             className="animate-marquee-rtl flex items-center"
             style={{ animationDuration: `${validSpeed}s` }}

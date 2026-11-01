@@ -19,12 +19,18 @@
 }
 
 @layer base {
-  * {
+  *,
+  ::before,
+  ::after {
     border-color: #E7DCD0;
+    box-sizing: border-box;
   }
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
   }
 
   body {
@@ -34,6 +40,10 @@
     direction: rtl;
     text-align: right;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    position: relative;
   }
 
   a {

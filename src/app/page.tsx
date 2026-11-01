@@ -30,19 +30,19 @@ export default async function HomePage() {
   const hailBranch = branches.find((b) => b.isHQ) || branches[0];
 
   return (
-    <div className="flex flex-col gap-20 md:gap-28 pb-20">
+    <div className="flex flex-col gap-14 sm:gap-20 md:gap-28 pb-20 w-full max-w-full overflow-x-hidden">
       {/* 1. Hero Section: Editorial Luxury on Warm Ivory */}
-      <section className="relative overflow-hidden bg-[#FAF6F0] pt-8 md:pt-16 pb-12 md:pb-20 border-b border-[#EBE3D7]">
+      <section className="relative overflow-hidden bg-[#FAF6F0] pt-6 sm:pt-8 md:pt-16 pb-10 sm:pb-12 md:pb-20 border-b border-[#EBE3D7] w-full max-w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-14 items-center">
             {/* Editorial Copy */}
-            <div className="lg:col-span-6 space-y-6 text-center lg:text-right">
+            <div className="lg:col-span-6 space-y-5 sm:space-y-6 text-center lg:text-right">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFE6D8] text-[#682D43] text-xs font-semibold tracking-wide">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059]" />
                 <span>مؤسسة حلا الأجاويد للحلويات — حائل</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-black text-[#4A1D2E] tracking-tight leading-[1.25]">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-black text-[#4A1D2E] tracking-tight leading-[1.25] break-words">
                 حلا الأجاويد
                 <span className="block text-[#682D43] font-serif font-normal mt-1">
                   نكهات أصيلة ولمسات عصرية
@@ -55,7 +55,7 @@ export default async function HomePage() {
               </p>
 
               {/* Single Primary Call To Action + Secondary Link */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
                 <Link
                   href="/products"
                   className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#682D43] text-[#FAF6F0] hover:bg-[#522234] text-sm font-bold tracking-wide transition-all duration-300 hover:shadow-lg active:scale-95 text-center"
@@ -81,24 +81,24 @@ export default async function HomePage() {
               </div>
 
               {/* Quality Accents */}
-              <div className="pt-8 border-t border-[#EBE3D7] grid grid-cols-3 gap-6 text-center lg:text-right">
+              <div className="pt-6 sm:pt-8 border-t border-[#EBE3D7] grid grid-cols-3 gap-3 sm:gap-6 text-center lg:text-right">
                 <div>
-                  <span className="block text-lg font-bold text-[#682D43] font-serif">طبيعي ١٠٠٪</span>
-                  <span className="text-[11px] text-[#8C7D82]">سمن ومكونات ممتازة</span>
+                  <span className="block text-base sm:text-lg font-bold text-[#682D43] font-serif">طبيعي ١٠٠٪</span>
+                  <span className="text-[10px] sm:text-[11px] text-[#8C7D82]">سمن ومكونات ممتازة</span>
                 </div>
                 <div>
-                  <span className="block text-lg font-bold text-[#682D43] font-serif">حرفية متقنة</span>
-                  <span className="text-[11px] text-[#8C7D82]">إعداد يدوي طازج</span>
+                  <span className="block text-base sm:text-lg font-bold text-[#682D43] font-serif">حرفية متقنة</span>
+                  <span className="text-[10px] sm:text-[11px] text-[#8C7D82]">إعداد يدوي طازج</span>
                 </div>
                 <div>
-                  <span className="block text-lg font-bold text-[#682D43] font-serif">ضيافة عريقة</span>
-                  <span className="text-[11px] text-[#8C7D82]">فخر التراث السعودي</span>
+                  <span className="block text-base sm:text-lg font-bold text-[#682D43] font-serif">ضيافة عريقة</span>
+                  <span className="text-[10px] sm:text-[11px] text-[#8C7D82]">فخر التراث السعودي</span>
                 </div>
               </div>
             </div>
 
             {/* Real Sweet Photography Slider */}
-            <div className="lg:col-span-6 relative">
+            <div className="lg:col-span-6 relative w-full max-w-full">
               <HeroImageSlider
                 images={
                   Array.isArray(settings.heroImages) && settings.heroImages.length > 0
@@ -113,7 +113,7 @@ export default async function HomePage() {
       </section>
 
       {/* 2. Categories Section: Slow Smooth Marquee Animation from Right to Left */}
-      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24">
+      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24 w-full max-w-full overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 md:mb-8 border-b border-[#EBE3D7] pb-4">
           <div>
             <span className="text-xs font-semibold text-[#9F6A76] tracking-widest uppercase">

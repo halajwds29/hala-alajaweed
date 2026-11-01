@@ -26,15 +26,15 @@ export default function MainLayoutWrapper({ children, settings }: MainLayoutWrap
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-16 lg:pb-0 print:pb-0 print:min-h-0 print:block">
-      <div className="no-print print:hidden">
+    <div className="flex flex-col min-h-screen pb-16 lg:pb-0 print:pb-0 print:min-h-0 print:block w-full max-w-full overflow-x-hidden">
+      <div className="no-print print:hidden w-full max-w-full overflow-x-hidden">
         <Suspense fallback={null}>
           <RouteProgressBar />
         </Suspense>
         <Header settings={settings} />
       </div>
-      <main className="flex-1 print:p-0 print:m-0 print:w-full">{children}</main>
-      <div className="no-print print:hidden">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden print:p-0 print:m-0 print:w-full">{children}</main>
+      <div className="no-print print:hidden w-full max-w-full overflow-x-hidden">
         <Footer settings={settings} />
         <CartDrawer />
         <FloatingWhatsApp phoneNumber={settings?.whatsapp || settings?.phone} />

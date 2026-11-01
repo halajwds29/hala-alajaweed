@@ -47,22 +47,22 @@ export default function CategoriesMarquee({ categories }: CategoriesMarqueeProps
         key={`${keyPrefix}-${cat._id || cat.slug}-${idx}`}
         href={`/categories/${cat.slug}`}
         dir="rtl"
-        className="group shrink-0 w-[150px] sm:w-[170px] bg-white rounded-3xl p-4 border border-[#EBE3D7] hover:border-[#682D43] transition-all duration-300 hover:shadow-lg flex flex-col items-center text-center transform hover:-translate-y-1.5 shadow-2xs select-none cursor-pointer"
+        className="group shrink-0 w-[130px] sm:w-[170px] bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-[#EBE3D7] hover:border-[#682D43] transition-all duration-300 hover:shadow-lg flex flex-col items-center text-center transform hover:-translate-y-1.5 shadow-2xs select-none cursor-pointer"
       >
-        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden mb-3 border-2 border-[#FAF6F0] group-hover:border-[#C5A059] transition-all shadow-xs group-hover:shadow-md">
+        <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mb-2 sm:mb-3 border-2 border-[#FAF6F0] group-hover:border-[#C5A059] transition-all shadow-xs group-hover:shadow-md">
           <Image
             src={imgSrc}
             alt={cat.name}
             fill
-            sizes="120px"
+            sizes="(max-width: 640px) 70px, 120px"
             className="object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none"
           />
         </div>
-        <h3 className="font-bold text-xs sm:text-sm text-[#4A1D2E] group-hover:text-[#682D43] transition-colors leading-snug text-center line-clamp-2">
+        <h3 className="font-bold text-[11px] sm:text-sm text-[#4A1D2E] group-hover:text-[#682D43] transition-colors leading-snug text-center line-clamp-2">
           {cat.name}
         </h3>
         {cat.nameEn && (
-          <span className="text-[9px] text-[#9F6A76] mt-1 uppercase tracking-wider line-clamp-1">
+          <span className="text-[8px] sm:text-[9px] text-[#9F6A76] mt-0.5 sm:mt-1 uppercase tracking-wider line-clamp-1">
             {cat.nameEn}
           </span>
         )}
@@ -71,7 +71,7 @@ export default function CategoriesMarquee({ categories }: CategoriesMarqueeProps
   };
 
   return (
-    <div className="relative group/marquee">
+    <div className="relative group/marquee w-full max-w-full overflow-hidden">
       {/* Top Left Navigation Buttons */}
       <div className="hidden sm:flex items-center gap-1.5 absolute -top-12 left-0 z-20">
         <button
@@ -95,23 +95,23 @@ export default function CategoriesMarquee({ categories }: CategoriesMarqueeProps
       </div>
 
       {/* Visual edge gradient masks for luxury fade */}
-      <div className="absolute right-0 top-0 bottom-0 w-10 sm:w-16 z-10 pointer-events-none bg-gradient-to-l from-[#FAF6F0] to-transparent" />
-      <div className="absolute left-0 top-0 bottom-0 w-10 sm:w-16 z-10 pointer-events-none bg-gradient-to-r from-[#FAF6F0] to-transparent" />
+      <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-l from-[#FAF6F0] to-transparent" />
+      <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 z-10 pointer-events-none bg-gradient-to-r from-[#FAF6F0] to-transparent" />
 
-      {/* Infinite Marquee Track: NEVER STOPS, NEVER EMPTIES */}
-      <div dir="ltr" className="overflow-hidden py-3 w-full">
+      {/* Infinite Marquee Track: NEVER STOPS, NEVER EMPTIES, NEVER OVERFLOWS */}
+      <div dir="ltr" className="overflow-hidden py-3 w-full max-w-full">
         <div
-          className="transition-transform duration-500 ease-out"
+          className="transition-transform duration-500 ease-out flex w-max"
           style={{ transform: `translate3d(${nudgeOffset}px, 0, 0)` }}
         >
-          <div className="animate-categories-ltr flex w-max">
+          <div className="animate-categories-ltr flex shrink-0">
             {/* Primary Infinite Track Group */}
-            <div className="flex shrink-0 items-center gap-4 pl-4">
+            <div className="flex shrink-0 items-center gap-3 sm:gap-4 pl-3 sm:pl-4">
               {singleGroup.map((cat, idx) => renderCard(cat, 'grp1', idx))}
             </div>
 
             {/* Seamless Identical Clone Group (creates the 100% gapless continuous loop) */}
-            <div className="flex shrink-0 items-center gap-4 pl-4" aria-hidden="true">
+            <div className="flex shrink-0 items-center gap-3 sm:gap-4 pl-3 sm:pl-4" aria-hidden="true">
               {singleGroup.map((cat, idx) => renderCard(cat, 'grp2', idx))}
             </div>
           </div>
