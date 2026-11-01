@@ -80,10 +80,10 @@ export default function Footer({ settings }: FooterProps) {
   ];
 
   return (
-    <footer className="bg-[#4A1D2E] text-[#F7F1E9] border-t-2 border-[#C5A059]/40 mt-28">
+    <footer className="bg-[#4A1D2E] text-[#F7F1E9] border-t-2 border-[#C5A059]/40 mt-12 sm:mt-20 md:mt-28 w-full max-w-full min-w-0">
       {/* Social Platforms Bar */}
-      <div className="border-b border-white/10 py-6 bg-[#3B1624]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="border-b border-white/10 py-4 sm:py-6 bg-[#3B1624]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-2 text-xs text-[#FAF6F0]">
             <span className="w-2 h-2 rounded-full bg-[#C5A059]" />
             <span className="font-bold">حسابات التواصل الرسمية الموحدة:</span>
@@ -98,7 +98,7 @@ export default function Footer({ settings }: FooterProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={soc.name}
-                className="w-9 h-9 rounded-full bg-white/5 hover:bg-[#C5A059] text-[#FAF6F0] hover:text-[#231E20] border border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-xs"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 hover:bg-[#C5A059] text-[#FAF6F0] hover:text-[#231E20] border border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-xs"
               >
                 {soc.icon}
               </a>
@@ -109,7 +109,7 @@ export default function Footer({ settings }: FooterProps) {
               href={settings?.socialLinks?.whatsappCatalog || 'https://wa.me/c/966546002435'}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-full bg-[#C5A059] hover:bg-[#d8b56f] text-[#231E20] text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#C5A059] hover:bg-[#d8b56f] text-[#231E20] text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
             >
               <span>كتالوج واتساب</span>
               <ExternalLink className="w-3 h-3" />
@@ -119,7 +119,7 @@ export default function Footer({ settings }: FooterProps) {
               href={settings?.socialLinks?.linkin1 || 'https://www.linkin1.com/halajwds'}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-[#FAF6F0] text-xs font-medium border border-white/20 transition-all flex items-center gap-1.5"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-[#FAF6F0] text-[11px] sm:text-xs font-medium border border-white/20 transition-all flex items-center gap-1.5"
             >
               <span>صفحة الروابط الموحدة</span>
               <ExternalLink className="w-3 h-3" />
@@ -129,7 +129,7 @@ export default function Footer({ settings }: FooterProps) {
       </div>
 
       {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
           {/* Brand & Identity Column */}
           <div className="lg:col-span-4 space-y-4">

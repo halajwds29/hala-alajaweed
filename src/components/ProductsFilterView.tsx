@@ -146,11 +146,11 @@ export default function ProductsFilterView({
 
       {/* Products Grid */}
       {filteredProducts.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#E7DCD0] p-12 text-center text-[#9F6A76] space-y-3">
-          <div className="w-16 h-16 rounded-full bg-[#FAF6F0] flex items-center justify-center mx-auto text-[#682D43]">
-            <SlidersHorizontal className="w-8 h-8" />
+        <div className="bg-white rounded-2xl border border-[#E7DCD0] p-8 sm:p-12 text-center text-[#9F6A76] space-y-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FAF6F0] flex items-center justify-center mx-auto text-[#682D43]">
+            <SlidersHorizontal className="w-6 h-6 sm:w-8 sm:h-8" />
           </div>
-          <h3 className="font-bold text-base text-[#4A1D2E]">لا توجد نتائج مطابقة لبحثك</h3>
+          <h3 className="font-bold text-sm sm:text-base text-[#4A1D2E]">لا توجد نتائج مطابقة لبحثك</h3>
           <p className="text-xs max-w-sm mx-auto">
             جرب تغيير كلمات البحث أو اختيار قسم آخر لعرض تشكيلات حلا الأجاويد.
           </p>
@@ -166,7 +166,7 @@ export default function ProductsFilterView({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {filteredProducts.map((product) => (
             <ProductCard key={product.slug} product={product} />
           ))}

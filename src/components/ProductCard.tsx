@@ -50,33 +50,33 @@ export default function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       {/* Product Information */}
-      <div className="p-5 flex-1 flex flex-col justify-between">
+      <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
           {/* Category Eyebrow */}
-          <div className="text-[11px] font-semibold text-[#9F6A76] tracking-wider mb-1.5">
+          <div className="text-[9px] sm:text-[11px] font-semibold text-[#9F6A76] tracking-wider mb-1">
             {product.categoryName || 'حلويات فاخرة'}
           </div>
 
           {/* Product Title */}
-          <h3 className="font-bold text-[#4A1D2E] text-base group-hover:text-[#682D43] transition-colors duration-200 leading-snug line-clamp-1 mb-2">
+          <h3 className="font-bold text-[#4A1D2E] text-xs sm:text-base group-hover:text-[#682D43] transition-colors duration-200 leading-snug line-clamp-1 mb-1 sm:mb-2">
             <Link href={`/products/${product.slug}`}>{product.name}</Link>
           </h3>
 
           {/* Short Description */}
-          <p className="text-xs text-[#6B5E62] line-clamp-2 leading-relaxed mb-4">
+          <p className="text-[10px] sm:text-xs text-[#6B5E62] line-clamp-2 leading-relaxed mb-2 sm:mb-4">
             {product.shortDescription}
           </p>
         </div>
 
         {/* Pricing & Call to Action */}
-        <div className="pt-3 border-t border-[#F7F1E9] flex items-center justify-between gap-3">
+        <div className="pt-2 sm:pt-3 border-t border-[#F7F1E9] flex items-center justify-between gap-1.5 sm:gap-3">
           <div>
-            <span className="text-[10px] text-[#9F6A76] block">يبدأ من</span>
-            <span className="text-base font-bold text-[#682D43] font-mono">
+            <span className="text-[9px] sm:text-[10px] text-[#9F6A76] block">يبدأ من</span>
+            <span className="text-xs sm:text-base font-bold text-[#682D43] font-mono">
               {formatSAR(lowestRetailPrice)}
             </span>
             {hasWholesale && (
-              <span className="text-[10px] text-[#C5A059] block font-medium">
+              <span className="text-[8px] sm:text-[10px] text-[#C5A059] block font-medium">
                 متوفر للجملة
               </span>
             )}
@@ -84,10 +84,10 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           <Link
             href={`/products/${product.slug}`}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#682D43] bg-[#FAF6F0] hover:bg-[#682D43] hover:text-[#FAF6F0] active:scale-95 transition-all duration-200 border border-[#EBE3D7] group/btn"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-bold text-[#682D43] bg-[#FAF6F0] hover:bg-[#682D43] hover:text-[#FAF6F0] active:scale-95 transition-all duration-200 border border-[#EBE3D7] group/btn shrink-0"
           >
             <span>التفاصيل</span>
-            <ArrowLeft className="w-3.5 h-3.5 group-hover/btn:-translate-x-1 transition-transform duration-200" />
+            <ArrowLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover/btn:-translate-x-1 transition-transform duration-200" />
           </Link>
         </div>
       </div>

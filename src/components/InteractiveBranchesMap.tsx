@@ -83,14 +83,14 @@ export default function InteractiveBranchesMap({
     branchesData.find((b) => b.id === selectedBranchId) || branchesData[0];
 
   return (
-    <div className="bg-white rounded-3xl border border-[#EBE3D7] p-6 sm:p-8 shadow-xs space-y-6">
+    <div className="bg-white rounded-3xl border border-[#EBE3D7] p-4 sm:p-8 shadow-xs space-y-5 sm:space-y-6 w-full max-w-full min-w-0">
       {/* Header & Tabs */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#EBE3D7]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 pb-4 border-b border-[#EBE3D7]">
         <div>
-          <span className="text-[11px] font-semibold text-[#9F6A76] tracking-widest uppercase">
+          <span className="text-[10px] sm:text-[11px] font-semibold text-[#9F6A76] tracking-widest uppercase">
             الخرائط التفاعلية المباشرة
           </span>
-          <h3 className="text-xl sm:text-2xl font-black text-[#4A1D2E] font-serif mt-0.5">
+          <h3 className="text-lg sm:text-2xl font-black text-[#4A1D2E] font-serif mt-0.5">
             مواقع حلا الأجاويد على خريطة Google
           </h3>
           <p className="text-xs text-[#6B5E62] mt-1">
@@ -99,21 +99,21 @@ export default function InteractiveBranchesMap({
         </div>
 
         {/* Branch Selector Tabs */}
-        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#FAF6F0] border border-[#EBE3D7] self-start md:self-auto">
+        <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-[#FAF6F0] border border-[#EBE3D7] self-stretch sm:self-start md:self-auto overflow-x-auto">
           {branchesData.map((branch) => {
             const isSelected = branch.id === selectedBranchId;
             return (
               <button
                 key={branch.id}
                 onClick={() => setSelectedBranchId(branch.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-300 whitespace-nowrap ${
                   isSelected
                     ? 'bg-[#682D43] text-[#FAF6F0] shadow-sm'
                     : 'text-[#4A1D2E] hover:bg-[#682D43]/5'
                 }`}
               >
                 <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-[#C5A059]' : 'text-[#9F6A76]'}`} />
-                <span>{branch.city === 'حائل' ? 'مقر حائل الرئيسي' : 'موقع الرياض (العنوان الوطني)'}</span>
+                <span>{branch.city === 'حائل' ? 'مقر حائل الرئيسي' : 'موقع الرياض'}</span>
               </button>
             );
           })}
@@ -121,15 +121,15 @@ export default function InteractiveBranchesMap({
       </div>
 
       {/* Grid: Map + Active Branch Detail Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
         {/* Interactive Google Map Frame */}
-        <div className="lg:col-span-8 rounded-2xl overflow-hidden border border-[#EBE3D7] shadow-inner bg-[#FAF6F0] relative min-h-[360px] sm:min-h-[420px]">
+        <div className="lg:col-span-8 rounded-2xl overflow-hidden border border-[#EBE3D7] shadow-inner bg-[#FAF6F0] relative min-h-[280px] sm:min-h-[420px]">
           <iframe
             key={activeBranch.id}
             src={activeBranch.embedUrl}
             width="100%"
             height="100%"
-            style={{ border: 0, minHeight: '380px' }}
+            style={{ border: 0, minHeight: '280px' }}
             allowFullScreen={false}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
@@ -138,14 +138,14 @@ export default function InteractiveBranchesMap({
           />
 
           {/* Quick Floating Pill on Map */}
-          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#EBE3D7] shadow-sm flex items-center gap-2 pointer-events-none text-xs font-bold text-[#4A1D2E]">
+          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-[#EBE3D7] shadow-sm flex items-center gap-1.5 sm:gap-2 pointer-events-none text-[10px] sm:text-xs font-bold text-[#4A1D2E]">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>خريطة تفاعلية مباشرة — {activeBranch.city}</span>
           </div>
         </div>
 
         {/* Active Branch Info Column */}
-        <div className="lg:col-span-4 bg-[#FAF6F0] rounded-2xl border border-[#EBE3D7] p-5 sm:p-6 flex flex-col justify-between space-y-4">
+        <div className="lg:col-span-4 bg-[#FAF6F0] rounded-2xl border border-[#EBE3D7] p-4 sm:p-6 flex flex-col justify-between space-y-4">
           <div className="space-y-4">
             <div>
               <span className="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-white text-[#682D43] border border-[#EBE3D7]">

@@ -40,3 +40,4 @@ export const config = {
     '/admin/:path*',
   ],
 };
+

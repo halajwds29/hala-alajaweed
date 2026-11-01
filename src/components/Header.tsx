@@ -59,7 +59,7 @@ export default function Header({ settings }: HeaderProps) {
       />
 
       {/* Main Luxury Navigation Bar with Centered Logo */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 sm:h-24 flex items-center justify-between relative">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-24 flex items-center justify-between relative">
         {/* Desktop Right Links (RTL start) */}
         <nav className="hidden lg:flex items-center gap-6 flex-1 justify-start">
           {rightNavLinks.map((link) => {
@@ -86,19 +86,30 @@ export default function Header({ settings }: HeaderProps) {
         </nav>
 
         {/* Mobile Right: Menu Toggle */}
-        <div className="flex lg:hidden items-center">
+        <div className="flex lg:hidden items-center shrink-0 z-20">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 text-[#682D43] hover:bg-[#682D43]/5 rounded-xl transition-colors active:scale-95"
+            className="p-2 text-[#682D43] hover:bg-[#682D43]/5 rounded-xl transition-colors active:scale-95"
             aria-label="القائمة"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* CENTERED LOGO: Both Desktop & Mobile */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center z-10 max-w-[140px] sm:max-w-none pointer-events-none">
-          <Logo size="md" className="pointer-events-auto max-h-12 sm:max-h-16 w-auto" customSrc={settings?.logoUrl} customHeight={settings?.logoHeight} />
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center z-10 max-w-[120px] sm:max-w-none pointer-events-none">
+          <Logo
+            size="sm"
+            className="pointer-events-auto sm:hidden max-h-10 w-auto"
+            customSrc={settings?.logoUrl}
+            customHeight={settings?.logoHeight ? Math.min(settings.logoHeight, 44) : 40}
+          />
+          <Logo
+            size="md"
+            className="pointer-events-auto hidden sm:inline-flex max-h-16 w-auto"
+            customSrc={settings?.logoUrl}
+            customHeight={settings?.logoHeight}
+          />
         </div>
 
         {/* Desktop Left Links & Actions (RTL end) */}
@@ -159,7 +170,7 @@ export default function Header({ settings }: HeaderProps) {
         </div>
 
         {/* Mobile Left: Search and Cart */}
-        <div className="flex lg:hidden items-center gap-2">
+        <div className="flex lg:hidden items-center gap-1.5 shrink-0 z-20">
           <Link
             href="/products"
             className="p-2 text-[#682D43] hover:bg-[#682D43]/5 rounded-lg transition-colors"

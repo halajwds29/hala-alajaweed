@@ -102,7 +102,7 @@ export default function PromoCouponPopup() {
         <aside
           role="complementary"
           aria-label="إشعار كود الخصم الترويجي"
-          className="fixed bottom-24 lg:bottom-8 right-4 sm:right-6 z-50 max-w-[340px] sm:max-w-sm w-[calc(100%-2rem)] bg-white/95 backdrop-blur-md rounded-3xl border-2 border-[#C5A059]/40 shadow-2xl p-5 animate-luxury-scale transition-all duration-300"
+          className="fixed bottom-20 lg:bottom-8 right-2 sm:right-6 z-50 max-w-[calc(100%-1rem)] sm:max-w-sm bg-white/95 backdrop-blur-md rounded-3xl border-2 border-[#C5A059]/40 shadow-2xl p-4 sm:p-5 animate-luxury-scale transition-all duration-300"
         >
           {/* Close button */}
           <button
@@ -178,12 +178,12 @@ export default function PromoCouponPopup() {
             setVisible(true);
             setMinimized(false);
           }}
-          className="fixed bottom-24 lg:bottom-8 right-4 z-40 bg-[#682D43] hover:bg-[#522234] text-white px-3.5 py-2 rounded-full shadow-lg border border-[#C5A059]/40 flex items-center gap-2 text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-95 animate-luxury-fade"
+          className="fixed bottom-20 lg:bottom-8 right-3 sm:right-4 z-40 bg-[#682D43] hover:bg-[#522234] text-white px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full shadow-lg border border-[#C5A059]/40 flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-95 animate-luxury-fade"
           title="عرض كود الخصم"
         >
-          <Gift className="w-4 h-4 text-[#C5A059] shrink-0" />
-          <span>كود خصم {promo.discountPercent}%</span>
-          <span className="font-mono bg-white/20 text-[#FAF6F0] px-1.5 py-0.5 rounded text-[10px]">
+          <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C5A059] shrink-0" />
+          <span>خصم {promo.discountPercent}%</span>
+          <span className="font-mono bg-white/20 text-[#FAF6F0] px-1.5 py-0.5 rounded text-[9px] sm:text-[10px]">
             {promo.code}
           </span>
         </button>
