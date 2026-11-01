@@ -1,0 +1,48 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+
+# Next.js build
+/.next/
+/out/
+/build
+
+# Testing & Coverage
+/coverage
+
+# Environment & Secret files - CRITICAL SECURITY (NEVER COMMIT SECRETS)
+.env
+.env*.local
+.env.production
+.env.development
+.env.test
+!.env.example
+
+# Local cache & data stores
+.data-cache/
+/data/admin-account.json
+.orders-cache.json
+cookies.txt
+
+# Logs & Debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.pem
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# TypeScript & Vercel
+*.tsbuildinfo
+next-env.d.ts
+.vercel

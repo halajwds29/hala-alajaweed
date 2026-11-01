@@ -1,0 +1,263 @@
+@import "tailwindcss";
+
+@source "../**/*.{ts,tsx,js,jsx}";
+
+@theme {
+  --font-sans: var(--font-tajawal), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-tajawal), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-burgundy: #682D43;
+  --color-burgundy-dark: #4A1D2E;
+  --color-burgundy-light: #833955;
+  --color-ivory: #F7F1E9;
+  --color-ivory-light: #FAF6F0;
+  --color-ivory-dark: #EFE6D8;
+  --color-dusty: #C99BA4;
+  --color-dusty-light: #E8D3D8;
+  --color-dusty-dark: #9F6A76;
+  --color-gold: #C5A059;
+  --color-gold-light: #DFBF7C;
+}
+
+@layer base {
+  * {
+    border-color: #E7DCD0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #FAF6F0;
+    color: #231E20;
+    font-family: var(--font-tajawal), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    direction: rtl;
+    text-align: right;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+/* Custom luxury scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF6F0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C99BA4;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #682D43;
+}
+
+@keyframes marqueeRTL {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-rtl {
+  display: flex;
+  width: max-content;
+  animation: marqueeRTL 25s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-rtl:hover {
+  animation-play-state: paused;
+}
+
+@keyframes categoriesSlideRTL {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes categoriesSlideLTR {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-categories-rtl {
+  display: flex;
+  width: max-content;
+  animation: categoriesSlideRTL 45s linear infinite;
+  will-change: transform;
+}
+
+.animate-categories-rtl:hover {
+  animation-play-state: paused;
+}
+
+.animate-categories-ltr {
+  display: flex;
+  width: max-content;
+  animation: categoriesSlideLTR 45s linear infinite;
+  will-change: transform;
+}
+
+.animate-categories-ltr:hover {
+  animation-play-state: paused;
+}
+
+/* Luxury animations and transitions */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+@keyframes luxuryFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes luxuryScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes luxuryFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes goldGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(197, 160, 89, 0.45);
+  }
+}
+
+.animate-page-enter {
+  animation: pageEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.animate-luxury-fade {
+  animation: luxuryFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-luxury-scale {
+  animation: luxuryScaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-luxury-float {
+  animation: luxuryFloat 4s ease-in-out infinite;
+}
+
+.glow-gold {
+  animation: goldGlow 3s ease-in-out infinite;
+}
+
+.transition-luxury {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-lift {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px -10px rgba(104, 45, 67, 0.12);
+}
+
+/* Glass & Card styles */
+.glass-luxury {
+  background: rgba(250, 246, 240, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.luxury-card {
+  background: #ffffff;
+  border: 1px solid #EBE3D7;
+  border-radius: 1.25rem;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-card:hover {
+  border-color: #C99BA4;
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -8px rgba(104, 45, 67, 0.09);
+}
+
+/* Hide scrollbar for category row while preserving touch scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
