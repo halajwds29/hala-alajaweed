@@ -11,6 +11,28 @@ interface CategoriesMarqueeProps {
 }
 
 export default function CategoriesMarquee({ categories }: CategoriesMarqueeProps) {
+  const [isPaused, setIsPaused] = useState(false);
+  const pauseTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleTouchStart = () => {
+    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    setIsPaused(true);
+  };
+
+  const handleTouchEnd = () => {
+    // Keep paused for 4.5 seconds after release so customer has time to click/review
+    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 4500);
+  };
+
+  React.useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    };
+  }, []);
+
   // Fallback real photography map
   const realImageFallbackMap: Record<string, string> = {
     '/images/baklava.svg': '/images/products/baklava-real.jpg',
@@ -69,9 +91,23 @@ export default function CategoriesMarquee({ categories }: CategoriesMarqueeProps
       <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-16 z-10 pointer-events-none bg-gradient-to-l from-[#FAF6F0] to-transparent" />
       <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-16 z-10 pointer-events-none bg-gradient-to-r from-[#FAF6F0] to-transparent" />
 
-      {/* Infinite Marquee Track: NEVER STOPS, NEVER EMPTIES, NEVER OVERFLOWS */}
-      <div dir="ltr" className="py-2 sm:py-3 w-full max-w-full min-w-0" style={{ overflowX: 'hidden' }}>
-        <div className="animate-categories-ltr flex shrink-0">
+      {/* Infinite Marquee Track: Calm, Majestic Luxury Pace (pauses immediately on touch/hover) */}
+      <div
+        dir="ltr"
+        className="py-2 sm:py-3 w-full max-w-full min-w-0"
+        style={{ overflowX: 'hidden' }}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div
+          className="animate-categories-ltr flex shrink-0"
+          style={{
+            animationPlayState: isPaused ? 'paused' : 'running',
+            animationDuration: '95s',
+          }}
+        >
           {/* Primary Infinite Track Group */}
           <div className="flex shrink-0 items-center gap-2.5 sm:gap-4 pl-2.5 sm:pl-4">
             {singleGroup.map((cat, idx) => renderCard(cat, 'grp1', idx))}

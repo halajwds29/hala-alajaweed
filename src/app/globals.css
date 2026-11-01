@@ -121,17 +121,27 @@
 .animate-categories-rtl {
   display: flex;
   width: max-content;
-  animation: categoriesSlideRTL 60s linear infinite;
+  animation: categoriesSlideRTL 95s linear infinite;
   will-change: transform;
   contain: layout paint;
+}
+
+.animate-categories-rtl:hover,
+.animate-categories-rtl:active {
+  animation-play-state: paused !important;
 }
 
 .animate-categories-ltr {
   display: flex;
   width: max-content;
-  animation: categoriesSlideLTR 60s linear infinite;
+  animation: categoriesSlideLTR 95s linear infinite;
   will-change: transform;
   contain: layout paint;
+}
+
+.animate-categories-ltr:hover,
+.animate-categories-ltr:active {
+  animation-play-state: paused !important;
 }
 
 /* Luxury animations and transitions */
