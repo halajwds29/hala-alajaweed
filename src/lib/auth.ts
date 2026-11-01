@@ -50,12 +50,13 @@ export async function getAdminSession(): Promise<{ username: string } | null> {
 
 export async function setAdminSession(response: NextResponse, username: string): Promise<void> {
   const token = await createAdminToken(username);
+  const isProduction = process.env.NODE_ENV === 'production';
   response.cookies.set({
     name: COOKIE_NAME,
     value: token,
     httpOnly: true,
-    // Avoid secure=true on plain HTTP localhost / LAN so session cookie is always stored and transmitted
-    secure: false,
+    // Use secure cookies in production (HTTPS), plain HTTP for local dev
+    secure: isProduction,
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 7, // 7 days
@@ -63,11 +64,12 @@ export async function setAdminSession(response: NextResponse, username: string):
 }
 
 export function clearAdminSession(response: NextResponse): void {
+  const isProduction = process.env.NODE_ENV === 'production';
   response.cookies.set({
     name: COOKIE_NAME,
     value: '',
     httpOnly: true,
-    secure: false,
+    secure: isProduction,
     sameSite: 'lax',
     path: '/',
     maxAge: 0,
@@ -89,24 +91,6 @@ export async function checkAdminAuthApi(req: NextRequest): Promise<boolean> {
     if (session !== null) return true;
   }
 
-  // 3. Fallback for Local / Admin Dashboard Same-Origin Requests:
-  // If the request originates from localhost or local IP within the admin console
-  const host = req.headers.get('host') || '';
-  const origin = req.headers.get('origin') || '';
-  const referer = req.headers.get('referer') || '';
-
-  const isLocalHost =
-    host.includes('localhost') ||
-    host.includes('127.0.0.1') ||
-    host.includes('192.168.') ||
-    host.includes('10.');
-
-  const isSameOrigin =
-    (origin && origin.includes(host)) || (referer && referer.includes(host));
-
-  if (isLocalHost && isSameOrigin) {
-    return true;
-  }
-
+  // No localhost bypass — every request must carry a valid JWT
   return false;
 }

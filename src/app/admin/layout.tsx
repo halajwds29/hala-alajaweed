@@ -26,6 +26,9 @@ export const metadata: Metadata = {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getAdminSession();
 
+  // Note: Route protection is handled by src/proxy.ts
+  // This layout renders only when a valid session exists
+
   return (
     <div className="min-h-screen bg-[#F7F1E9] flex flex-col lg:flex-row text-[#231E20] font-sans" dir="rtl">
       {/* Sidebar (Desktop) */}
@@ -85,6 +88,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="p-4 sm:p-6 lg:p-8 flex-1">
           {children}
         </div>
+
+        {/* Admin Footer */}
+        <footer className="border-t border-[#E7DCD0] py-4 px-6 bg-white text-center text-xs text-[#8C7D82] space-y-0.5">
+          <p>© 2026 حلا الأجاويد للحلويات | جميع الحقوق محفوظة</p>
+          <p className="text-[10px] text-[#C5A059] font-mono">Powered by Hala Alajaweed</p>
+        </footer>
       </main>
     </div>
   );

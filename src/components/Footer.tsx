@@ -311,9 +311,14 @@ export default function Footer({ settings }: FooterProps) {
       {/* Bottom Legal Sub-Footer */}
       <div className="border-t border-white/10 py-6 bg-[#320f1c] text-xs text-[#C99BA4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-right">
-          <p>
-            جميع الحقوق محفوظة © {new Date().getFullYear()} مؤسسة حلا الأجاويد للحلويات — HALA ALAJAWEED.
-          </p>
+          <div className="space-y-1">
+            <p className="font-medium text-[#FAF6F0]">
+              © 2026 حلا الأجاويد للحلويات | جميع الحقوق محفوظة
+            </p>
+            <p className="text-[11px] text-[#C5A059] font-mono tracking-wider">
+              Powered by Hala Alajaweed
+            </p>
+          </div>
           <div className="flex items-center gap-4 text-[11px]">
             <a href="https://halajwds.com" className="hover:text-white transition-colors">
               halajwds.com
