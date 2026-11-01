@@ -9,17 +9,19 @@ interface ProductsFilterViewProps {
   initialProducts: Product[];
   categories: Category[];
   initialCategorySlug?: string;
+  initialOnlyWholesale?: boolean;
 }
 
 export default function ProductsFilterView({
   initialProducts,
   categories,
   initialCategorySlug = 'all',
+  initialOnlyWholesale = false,
 }: ProductsFilterViewProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategorySlug);
   const [searchQuery, setSearchQuery] = useState('');
   const [priceSort, setPriceSort] = useState<'default' | 'asc' | 'desc'>('default');
-  const [onlyWholesale, setOnlyWholesale] = useState(false);
+  const [onlyWholesale, setOnlyWholesale] = useState(initialOnlyWholesale);
   const [mobileColumns, setMobileColumns] = useState<'1' | '2'>('2');
 
   const filteredProducts = useMemo(() => {
