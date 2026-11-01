@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getAdminSession } from '@/lib/auth';
 import {
   LayoutDashboard,
@@ -26,8 +27,10 @@ export const metadata: Metadata = {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getAdminSession();
 
-  // Note: Route protection is handled by src/proxy.ts
-  // This layout renders only when a valid session exists
+  // Enforce session check on the server: redirect to login if not authenticated
+  if (!session) {
+    redirect('/admin/login');
+  }
 
   return (
     <div className="min-h-screen bg-[#F7F1E9] flex flex-col lg:flex-row text-[#231E20] font-sans" dir="rtl">

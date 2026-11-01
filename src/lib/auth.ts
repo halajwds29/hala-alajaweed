@@ -65,6 +65,7 @@ export async function setAdminSession(response: NextResponse, username: string):
 
 export function clearAdminSession(response: NextResponse): void {
   const isProduction = process.env.NODE_ENV === 'production';
+  response.cookies.delete(COOKIE_NAME);
   response.cookies.set({
     name: COOKIE_NAME,
     value: '',
@@ -73,6 +74,7 @@ export function clearAdminSession(response: NextResponse): void {
     sameSite: 'lax',
     path: '/',
     maxAge: 0,
+    expires: new Date(0),
   });
 }
 

@@ -36,7 +36,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match /admin and all sub-paths, but skip static assets
+    '/admin',
     '/admin/:path*',
   ],
 };
