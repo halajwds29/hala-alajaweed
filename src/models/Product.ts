@@ -46,6 +46,7 @@ const ProductImageSchema = new Schema<ProductImage>(
 
 const ProductSchema = new Schema<ProductType>(
   {
+    _id: { type: String },
     name: { type: String, required: true, trim: true },
     nameEn: { type: String, trim: true },
     slug: { type: String, required: true, unique: true, index: true, trim: true },

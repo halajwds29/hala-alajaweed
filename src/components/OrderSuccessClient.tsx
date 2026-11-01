@@ -95,9 +95,9 @@ export default function OrderSuccessClient({
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      {/* Success Banner */}
-      <div className="text-center bg-white rounded-3xl border border-[#E7DCD0] p-8 sm:p-10 shadow-sm relative overflow-hidden">
+    <div className="max-w-3xl mx-auto space-y-8 print:py-0 print:space-y-0 print:max-w-full print:px-0">
+      {/* Success Banner (Screen only - HIDDEN IN PRINT) */}
+      <div className="text-center bg-white rounded-3xl border border-[#E7DCD0] p-8 sm:p-10 shadow-sm relative overflow-hidden no-print print:hidden">
         <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4 border border-emerald-200 shadow-sm">
           <CheckCircle2 className="w-8 h-8" />
         </div>
@@ -166,8 +166,9 @@ export default function OrderSuccessClient({
           </a>
 
           <button
+            type="button"
             onClick={() => window.print()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-[#FAF6F0] hover:bg-[#EBE3D7] text-[#4A1D2E] font-bold text-xs border border-[#E7DCD0] transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-[#FAF6F0] hover:bg-[#EBE3D7] text-[#4A1D2E] font-bold text-xs border border-[#E7DCD0] transition-colors cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             <span>طباعة الفاتورة</span>
@@ -175,10 +176,44 @@ export default function OrderSuccessClient({
         </div>
       </div>
 
-      {/* Order Details Breakdown Card */}
+      {/* Order Details Breakdown Card / Printable Invoice */}
       {order && (
-        <div className="bg-white rounded-3xl border border-[#E7DCD0] p-6 sm:p-8 shadow-sm space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-[#E7DCD0]">
+        <div className="bg-white rounded-3xl border border-[#E7DCD0] p-6 sm:p-8 shadow-sm space-y-6 printable-invoice-container print:space-y-3 print:p-4 print:border-[1.5px] print:border-[#4A1D2E]">
+          {/* Print-Only Official Header */}
+          <div className="hidden print:flex items-center justify-between pb-3 border-b-2 border-[#4A1D2E]">
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo.png"
+                alt="شعار مؤسسة حلا الأجاويد للحلويات"
+                className="w-16 h-14 object-contain"
+              />
+              <div>
+                <h1 className="text-base font-black text-[#4A1D2E] leading-tight">
+                  مؤسسة حلا الأجاويد للحلويات
+                </h1>
+                <p className="text-[10px] font-bold text-[#9F6A76]">
+                  فخر الضيافة السعودية الأصيلة — سجل تجاري معتمد
+                </p>
+                <p className="text-[9px] text-gray-600">
+                  المقر الرئيسي: حائل — حي النقرة | هاتف: 0541430116 | واتساب: 0546002435
+                </p>
+              </div>
+            </div>
+            <div className="text-left font-mono">
+              <span className="inline-block px-2.5 py-0.5 rounded bg-[#682D43] text-white text-[10px] font-black mb-1">
+                فاتورة طلب رسمية
+              </span>
+              <p className="text-xs font-black text-[#4A1D2E] dir-ltr">{order.orderNumber}</p>
+              <p className="text-[9px] text-gray-500">{formatDateAr(order.createdAt)}</p>
+              <p className="text-[9px] font-bold text-[#682D43]">
+                الحالة: {statusInfo.label}
+              </p>
+            </div>
+          </div>
+
+          {/* Screen Header */}
+          <div className="flex items-center justify-between pb-4 border-b border-[#E7DCD0] print:hidden">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-[#4A1D2E] flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-[#C5A059]" />
@@ -196,7 +231,7 @@ export default function OrderSuccessClient({
           </div>
 
           {/* Customer / Delivery Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-[#FAF6F0] border border-[#EBE3D7] text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-[#FAF6F0] border border-[#EBE3D7] text-xs print:p-2.5 print:rounded-lg print:border-gray-300 print:text-[10px] print:grid-cols-2 print:gap-2">
             <div className="space-y-1">
               <span className="font-bold text-[#4A1D2E] block">بيانات العميل والتواصل:</span>
               <p className="text-gray-700">
@@ -208,76 +243,92 @@ export default function OrderSuccessClient({
                 </strong>
               </p>
               {order.customerNotes && (
-                <p className="text-[11px] text-[#682D43] italic mt-1">
+                <p className="text-[11px] text-[#682D43] italic mt-1 print:text-[10px]">
                   ملاحظة العميل: «{order.customerNotes}»
                 </p>
               )}
             </div>
 
-            <div className="space-y-1 sm:border-r sm:border-[#E7DCD0] sm:pr-4">
+            <div className="space-y-1 sm:border-r sm:border-[#E7DCD0] sm:pr-4 print:border-r print:border-gray-300 print:pr-3">
               <span className="font-bold text-[#4A1D2E] block">طريقة الاستلام والعنوان:</span>
               <p className="text-gray-700">
                 {order.deliveryMethod === 'pickup'
-                  ? 'استلام من الفرع'
-                  : `توصيل: ${order.customer.city || 'حائل'} ${
+                  ? 'استلام من الفرع الرئيسي'
+                  : `توصيل وشحن: ${order.customer.city || 'حائل'} ${
                       order.customer.district && order.customer.district !== 'سيتم التحديد عبر التواصل'
                         ? `— ${order.customer.district}`
                         : ''
                     }`}
               </p>
               {order.customer.address && order.customer.address !== 'سيتم التحديد عبر التواصل' && (
-                <p className="text-[11px] text-gray-500">{order.customer.address}</p>
+                <p className="text-[11px] text-gray-500 print:text-[9px]">{order.customer.address}</p>
               )}
             </div>
           </div>
 
           {/* Items Table */}
-          <div className="divide-y divide-[#E7DCD0] border-y border-[#E7DCD0]">
-            {order.items.map((item, idx) => (
-              <div key={idx} className="py-3.5 flex items-center justify-between text-xs gap-3">
-                <div className="flex-1">
-                  <h4 className="font-bold text-[#4A1D2E]">{item.productName}</h4>
-                  <div className="flex items-center gap-2 text-[11px] text-gray-500 mt-0.5">
-                    <span>{item.variantName}</span>
-                    <span>•</span>
-                    <span>الكمية: {item.quantity}</span>
-                  </div>
-                </div>
-                <div className="text-left font-mono font-bold text-[#4A1D2E]">
-                  {formatSAR(item.totalPrice)}
-                </div>
-              </div>
-            ))}
+          <div className="border border-[#E7DCD0] rounded-2xl overflow-hidden print:border-gray-300 print:rounded-lg">
+            <table className="w-full text-right text-xs printable-invoice-table">
+              <thead className="bg-[#FAF6F0] text-[#4A1D2E] border-b border-[#E7DCD0] print:bg-gray-100 print:border-gray-300">
+                <tr>
+                  <th className="py-2.5 px-3 font-bold">#</th>
+                  <th className="py-2.5 px-3 font-bold">الصنف المطلوب</th>
+                  <th className="py-2.5 px-3 font-bold">الخيار</th>
+                  <th className="py-2.5 px-3 font-bold text-center">الكمية</th>
+                  <th className="py-2.5 px-3 font-bold font-mono">سعر الوحدة</th>
+                  <th className="py-2.5 px-3 font-bold font-mono text-left">الإجمالي</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E7DCD0]/60 print:divide-gray-200">
+                {order.items.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-[#FAF6F0]/50">
+                    <td className="py-2 px-3 text-gray-500 font-mono text-[11px]">{idx + 1}</td>
+                    <td className="py-2 px-3 font-bold text-[#4A1D2E]">{item.productName}</td>
+                    <td className="py-2 px-3 text-[#9F6A76] text-[11px] print:text-gray-700">{item.variantName}</td>
+                    <td className="py-2 px-3 font-mono font-bold text-center">{item.quantity}</td>
+                    <td className="py-2 px-3 font-mono text-gray-700 text-[11px]">{formatSAR(item.unitPrice)}</td>
+                    <td className="py-2 px-3 font-mono font-black text-[#682D43] text-left">{formatSAR(item.totalPrice)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           {/* Pricing Totals */}
-          <div className="space-y-2 pt-2 text-xs">
-            <div className="flex justify-between text-gray-600">
-              <span>المجموع الفرعي:</span>
-              <span className="font-mono">{formatSAR(order.subtotal)}</span>
-            </div>
-            {order.discountTotal > 0 && (
-              <div className="flex justify-between text-emerald-700 font-bold">
-                <span>إجمالي الخصم المطبق:</span>
-                <span className="font-mono">- {formatSAR(order.discountTotal)}</span>
+          <div className="flex justify-end pt-1">
+            <div className="w-full sm:w-64 space-y-1.5 text-xs print:w-60 print:text-[10px] print:space-y-1">
+              <div className="flex justify-between text-gray-600">
+                <span>المجموع الفرعي:</span>
+                <span className="font-mono font-bold">{formatSAR(order.subtotal)}</span>
               </div>
-            )}
-            <div className="flex justify-between text-gray-600">
-              <span>رسوم التوصيل:</span>
-              <span className="font-mono">
-                {order.deliveryFee === 0 ? 'مجاناً' : formatSAR(order.deliveryFee)}
-              </span>
+              {order.discountTotal > 0 && (
+                <div className="flex justify-between text-emerald-700 font-bold">
+                  <span>إجمالي الخصم المطبق:</span>
+                  <span className="font-mono">- {formatSAR(order.discountTotal)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-gray-600">
+                <span>رسوم التوصيل:</span>
+                <span className="font-mono">
+                  {order.deliveryFee === 0 ? 'مجاناً' : formatSAR(order.deliveryFee)}
+                </span>
+              </div>
+              <div className="flex justify-between items-baseline pt-2 border-t-2 border-[#4A1D2E] text-base font-black text-[#4A1D2E] print:pt-1">
+                <span>الإجمالي المستحق:</span>
+                <span className="text-lg text-[#682D43] font-mono print:text-sm">{formatSAR(order.total)}</span>
+              </div>
             </div>
-            <div className="flex justify-between items-baseline pt-3 border-t border-[#E7DCD0] text-base font-black text-[#4A1D2E]">
-              <span>الإجمالي المستحق:</span>
-              <span className="text-xl text-[#682D43] font-mono">{formatSAR(order.total)}</span>
-            </div>
+          </div>
+
+          {/* Print-Only Footer Note */}
+          <div className="hidden print:block text-center pt-2.5 border-t border-gray-300 text-[9px] text-gray-500">
+            شكراً لتعاملكم مع حلا الأجاويد • فخر الضيافة السعودية الأصيلة • هاتف وواتساب: 0541430116 / 0546002435
           </div>
         </div>
       )}
 
       {/* Navigation footer */}
-      <div className="flex items-center justify-between text-xs no-print">
+      <div className="flex items-center justify-between text-xs no-print print:hidden">
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 text-[#682D43] hover:text-[#C5A059] font-bold"

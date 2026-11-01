@@ -3,6 +3,7 @@ import { Branch as BranchType } from '@/types';
 
 const BranchSchema = new Schema<BranchType>(
   {
+    _id: { type: String },
     name: { type: String, required: true },
     city: { type: String, required: true },
     district: { type: String, required: true },

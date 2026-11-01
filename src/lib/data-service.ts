@@ -125,26 +125,36 @@ function normalizeCategoryPhotos(cat: Category): Category {
   };
 }
 
+let isSeedingInProgress = false;
+
 async function initMongoSeedIfNeeded() {
+  if (isSeedingInProgress) return;
+  isSeedingInProgress = true;
   try {
     const catCount = await CategoryModel.countDocuments();
     if (catCount === 0) {
-      await CategoryModel.insertMany(initialCategories);
+      await CategoryModel.insertMany(initialCategories, { ordered: false }).catch(() => {});
     }
     const prodCount = await ProductModel.countDocuments();
     if (prodCount === 0) {
-      await ProductModel.insertMany(initialProducts);
+      await ProductModel.insertMany(initialProducts, { ordered: false }).catch(() => {});
     }
     const branchCount = await BranchModel.countDocuments();
     if (branchCount === 0) {
-      await BranchModel.insertMany(initialBranches);
+      await BranchModel.insertMany(initialBranches, { ordered: false }).catch(() => {});
     }
     const settingsCount = await SiteSettingsModel.countDocuments();
     if (settingsCount === 0) {
-      await SiteSettingsModel.create(initialSiteSettings);
+      await SiteSettingsModel.create(initialSiteSettings).catch(() => {});
     }
-  } catch (err) {
-    console.error('Error seeding MongoDB:', err);
+  } catch (err: unknown) {
+    // Gracefully handle parallel seeding collisions across SSR workers
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!msg.includes('E11000') && !msg.includes('duplicate key')) {
+      console.error('Error seeding MongoDB:', err);
+    }
+  } finally {
+    isSeedingInProgress = false;
   }
 }
 

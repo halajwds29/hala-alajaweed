@@ -109,9 +109,9 @@ export default function TrackOrderPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 print:py-0 print:space-y-0 print:max-w-full print:px-0">
       {/* Header */}
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 no-print print:hidden">
         <div className="w-14 h-14 rounded-2xl bg-[#682D43]/10 text-[#682D43] flex items-center justify-center mx-auto mb-3">
           <Truck className="w-7 h-7" />
         </div>
@@ -124,7 +124,7 @@ export default function TrackOrderPage() {
       </div>
 
       {/* Lookup Form: Phone Number ONLY required */}
-      <div className="bg-white rounded-3xl border border-[#E7DCD0] p-6 sm:p-8 shadow-sm">
+      <div className="bg-white rounded-3xl border border-[#E7DCD0] p-6 sm:p-8 shadow-sm no-print print:hidden">
         <form onSubmit={handleSearch} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Phone Number: The ONLY required input */}
@@ -191,7 +191,7 @@ export default function TrackOrderPage() {
 
       {/* Multiple Orders Selector (if more than 1 order found for this phone) */}
       {orders.length > 1 && (
-        <div className="bg-[#FAF6F0] rounded-2xl border border-[#E7DCD0] p-4 space-y-2">
+        <div className="bg-[#FAF6F0] rounded-2xl border border-[#E7DCD0] p-4 space-y-2 no-print print:hidden">
           <div className="flex items-center justify-between text-xs text-[#4A1D2E] font-bold">
             <span>تم العثور على {orders.length} طلبات مسجلة برقم الجوال:</span>
             <span className="text-[11px] text-[#8C7D82]">اضغط على أي طلب لعرض تفاصيله</span>
@@ -226,11 +226,44 @@ export default function TrackOrderPage() {
         </div>
       )}
 
-      {/* Order Status Display */}
+      {/* Order Status Display / Printable Invoice */}
       {order && (
-        <div className="bg-white rounded-3xl border border-[#E7DCD0] p-6 sm:p-8 shadow-sm space-y-8 animate-fadeIn">
-          {/* Order Header Summary */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#E7DCD0]">
+        <div className="bg-white rounded-3xl border border-[#E7DCD0] p-6 sm:p-8 shadow-sm space-y-8 animate-fadeIn printable-invoice-container print:space-y-3 print:p-4 print:border-[1.5px] print:border-[#4A1D2E]">
+          {/* Print-Only Official Invoice Header */}
+          <div className="hidden print:flex items-center justify-between pb-3 border-b-2 border-[#4A1D2E]">
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo.png"
+                alt="شعار مؤسسة حلا الأجاويد للحلويات"
+                className="w-16 h-14 object-contain"
+              />
+              <div>
+                <h1 className="text-base font-black text-[#4A1D2E] leading-tight">
+                  مؤسسة حلا الأجاويد للحلويات
+                </h1>
+                <p className="text-[10px] font-bold text-[#9F6A76]">
+                  فخر الضيافة السعودية الأصيلة — سجل تجاري معتمد
+                </p>
+                <p className="text-[9px] text-gray-600">
+                  المقر الرئيسي: حائل — حي النقرة | هاتف: 0541430116 | واتساب: 0546002435
+                </p>
+              </div>
+            </div>
+            <div className="text-left font-mono">
+              <span className="inline-block px-2.5 py-0.5 rounded bg-[#682D43] text-white text-[10px] font-black mb-1">
+                فاتورة طلب رسمية
+              </span>
+              <p className="text-xs font-black text-[#4A1D2E] dir-ltr">{order.orderNumber}</p>
+              <p className="text-[9px] text-gray-500">{formatDateAr(order.createdAt)}</p>
+              <p className="text-[9px] font-bold text-[#682D43]">
+                الحالة: {translateStatus(order.status).label}
+              </p>
+            </div>
+          </div>
+
+          {/* Screen-Only Order Header Summary */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#E7DCD0] print:hidden">
             <div>
               <span className="text-[11px] text-[#9F6A76] block mb-0.5">كود الطلب المعتمد:</span>
               <div className="flex items-center gap-2">
@@ -263,92 +296,136 @@ export default function TrackOrderPage() {
             </div>
           </div>
 
-          {/* Timeline */}
-          {order.status === 'cancelled' ? (
-            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 text-center space-y-1">
-              <p className="font-bold text-sm">تم إلغاء هذا الطلب</p>
-              <p className="text-[11px]">
-                إذا كان لديكم أي استفسار حول سبب الإلغاء يرجى التواصل مباشرة عبر واتساب المتجر.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-[#4A1D2E]">مراحل تجهيز وتسليم الطلب:</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                {steps.map((st, i) => {
-                  const state = getStepStatus(st.key, order.status);
-                  return (
-                    <div
-                      key={st.key}
-                      className={`p-3 rounded-xl border text-center text-xs flex flex-col justify-between transition-all ${
-                        state === 'completed'
-                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
-                          : state === 'current'
-                          ? 'bg-[#682D43] border-[#682D43] text-white shadow-md font-bold'
-                          : 'bg-[#FAF6F0] border-[#E7DCD0] text-gray-400'
-                      }`}
-                    >
-                      <div className="w-6 h-6 rounded-full mx-auto mb-2 flex items-center justify-center text-[10px] font-black border">
-                        {state === 'completed' ? '✓' : i + 1}
-                      </div>
-                      <span className="text-[11px] leading-tight">{st.label}</span>
-                    </div>
-                  );
-                })}
+          {/* Timeline (Screen only - HIDDEN IN PRINT to fit 1 page) */}
+          <div className="no-print print:hidden">
+            {order.status === 'cancelled' ? (
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 text-center space-y-1">
+                <p className="font-bold text-sm">تم إلغاء هذا الطلب</p>
+                <p className="text-[11px]">
+                  إذا كان لديكم أي استفسار حول سبب الإلغاء يرجى التواصل مباشرة عبر واتساب المتجر.
+                </p>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold text-[#4A1D2E]">مراحل تجهيز وتسليم الطلب:</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                  {steps.map((st, i) => {
+                    const state = getStepStatus(st.key, order.status);
+                    return (
+                      <div
+                        key={st.key}
+                        className={`p-3 rounded-xl border text-center text-xs flex flex-col justify-between transition-all ${
+                          state === 'completed'
+                            ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                            : state === 'current'
+                            ? 'bg-[#682D43] border-[#682D43] text-white shadow-md font-bold'
+                            : 'bg-[#FAF6F0] border-[#E7DCD0] text-gray-400'
+                        }`}
+                      >
+                        <div className="w-6 h-6 rounded-full mx-auto mb-2 flex items-center justify-center text-[10px] font-black border">
+                          {state === 'completed' ? '✓' : i + 1}
+                        </div>
+                        <span className="text-[11px] leading-tight">{st.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
 
-          {/* Customer & Items Summary */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-[#FAF6F0] p-4 rounded-2xl border border-[#E7DCD0]">
+          {/* Customer & Delivery Summary */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-[#FAF6F0] p-4 rounded-2xl border border-[#E7DCD0] print:p-2.5 print:rounded-lg print:border-gray-300 print:text-[10px] print:grid-cols-2 print:gap-2">
             <div>
-              <span className="text-[#9F6A76] block mb-0.5">بيانات العميل:</span>
+              <span className="text-[#9F6A76] block mb-0.5 print:text-gray-500">بيانات العميل:</span>
               <span className="font-bold text-[#4A1D2E] block">
                 {order.customer.name && order.customer.name !== 'عميل حلا الأجاويد'
                   ? order.customer.name
                   : 'عميل حلا الأجاويد'}
               </span>
-              <span className="font-mono text-gray-600 dir-ltr inline-block mt-0.5">
+              <span className="font-mono text-gray-700 dir-ltr inline-block mt-0.5 font-bold">
                 {order.customer.phone}
               </span>
             </div>
             <div>
-              <span className="text-[#9F6A76] block mb-0.5">طريقة الاستلام والمدينة:</span>
+              <span className="text-[#9F6A76] block mb-0.5 print:text-gray-500">طريقة الاستلام والمدينة:</span>
               <span className="font-bold text-[#4A1D2E] block">
-                {order.deliveryMethod === 'pickup' ? 'استلام من الفرع الرئيسي' : 'توصيل وشحن'}
+                {order.deliveryMethod === 'pickup' ? 'استلام من الفرع الرئيسي' : 'توصيل وشحن للعنوان'}
               </span>
-              <span className="text-gray-600 block mt-0.5">
+              <span className="text-gray-700 block mt-0.5">
                 {order.customer.city || 'حائل'}
                 {order.customer.district && order.customer.district !== 'سيتم التحديد عبر التواصل'
                   ? ` — ${order.customer.district}`
                   : ''}
               </span>
             </div>
+            {order.customerNotes && (
+              <div className="sm:col-span-2 pt-1 border-t border-[#E7DCD0] print:pt-1">
+                <span className="text-[#9F6A76] text-[10px] print:text-gray-500">ملاحظات العميل: </span>
+                <span className="font-medium text-gray-800 italic">{order.customerNotes}</span>
+              </div>
+            )}
+          </div>
 
-            <div className="sm:col-span-2 pt-2 border-t border-[#E7DCD0]">
-              <span className="text-[#9F6A76] block mb-1">المنتجات المطلوبة ({order.items.length}):</span>
-              <ul className="space-y-1.5">
+          {/* Products / Items Table (Optimized for both screen & single-page print) */}
+          <div className="border border-[#E7DCD0] rounded-2xl overflow-hidden print:border-gray-300 print:rounded-lg">
+            <table className="w-full text-right text-xs printable-invoice-table">
+              <thead className="bg-[#FAF6F0] text-[#4A1D2E] border-b border-[#E7DCD0] print:bg-gray-100 print:border-gray-300">
+                <tr>
+                  <th className="py-2.5 px-3 font-bold">#</th>
+                  <th className="py-2.5 px-3 font-bold">الصنف المطلوب</th>
+                  <th className="py-2.5 px-3 font-bold">الخيار</th>
+                  <th className="py-2.5 px-3 font-bold text-center">الكمية</th>
+                  <th className="py-2.5 px-3 font-bold font-mono">سعر الوحدة</th>
+                  <th className="py-2.5 px-3 font-bold font-mono text-left">الإجمالي</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E7DCD0]/60 print:divide-gray-200">
                 {order.items.map((i, idx) => (
-                  <li key={idx} className="flex justify-between border-b border-[#E7DCD0]/60 pb-1">
-                    <span>
-                      {i.productName} ({i.variantName}) × {i.quantity}
-                    </span>
-                    <span className="font-mono font-bold text-[#682D43]">
-                      {formatSAR(i.totalPrice)}
-                    </span>
-                  </li>
+                  <tr key={idx} className="hover:bg-[#FAF6F0]/50">
+                    <td className="py-2 px-3 text-gray-500 font-mono text-[11px]">{idx + 1}</td>
+                    <td className="py-2 px-3 font-bold text-[#4A1D2E]">{i.productName}</td>
+                    <td className="py-2 px-3 text-[#9F6A76] text-[11px] print:text-gray-700">{i.variantName}</td>
+                    <td className="py-2 px-3 font-mono font-bold text-center">{i.quantity}</td>
+                    <td className="py-2 px-3 font-mono text-gray-700 text-[11px]">{formatSAR(i.unitPrice)}</td>
+                    <td className="py-2 px-3 font-mono font-black text-[#682D43] text-left">{formatSAR(i.totalPrice)}</td>
+                  </tr>
                 ))}
-              </ul>
-            </div>
+              </tbody>
+            </table>
+          </div>
 
-            <div className="sm:col-span-2 pt-2 flex justify-between font-black text-sm text-[#4A1D2E]">
-              <span>إجمالي الطلب:</span>
-              <span className="text-[#682D43] font-mono text-base">{formatSAR(order.total)}</span>
+          {/* Invoice Financial Summary */}
+          <div className="flex justify-end pt-1">
+            <div className="w-full sm:w-64 space-y-1.5 text-xs print:w-60 print:text-[10px] print:space-y-1">
+              <div className="flex justify-between text-gray-600">
+                <span>المجموع الفرعي:</span>
+                <span className="font-mono font-bold">{formatSAR(order.subtotal)}</span>
+              </div>
+              {order.discountTotal > 0 && (
+                <div className="flex justify-between text-emerald-700 font-bold">
+                  <span>الخصم المطبق:</span>
+                  <span className="font-mono">- {formatSAR(order.discountTotal)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-gray-600">
+                <span>رسوم التوصيل:</span>
+                <span className="font-mono">{order.deliveryFee === 0 ? 'مجاناً' : formatSAR(order.deliveryFee)}</span>
+              </div>
+              <div className="pt-2 border-t-2 border-[#4A1D2E] flex justify-between items-baseline font-black text-sm text-[#4A1D2E] print:pt-1">
+                <span>المجموع النهائي:</span>
+                <span className="text-base text-[#682D43] font-mono print:text-sm">{formatSAR(order.total)}</span>
+              </div>
             </div>
           </div>
 
-          {/* Action on this order */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#E7DCD0]">
+          {/* Print-Only Official Footer Note */}
+          <div className="hidden print:block text-center pt-2.5 border-t border-gray-300 text-[9px] text-gray-500">
+            شكراً لتعاملكم مع حلا الأجاويد • فخر الضيافة السعودية الأصيلة • هاتف وواتساب: 0541430116 / 0546002435
+          </div>
+
+          {/* Action on this order (Screen only - HIDDEN IN PRINT) */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#E7DCD0] no-print print:hidden">
             <div className="flex items-center gap-2">
               <a
                 href={buildWhatsAppOrderMessage(order, '+966546002435')}
@@ -361,11 +438,12 @@ export default function TrackOrderPage() {
               </a>
 
               <button
+                type="button"
                 onClick={() => window.print()}
-                className="px-4 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#EBE3D7] text-[#4A1D2E] text-xs font-bold transition-colors flex items-center gap-1.5 border border-[#E7DCD0]"
+                className="px-4 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#EBE3D7] text-[#4A1D2E] text-xs font-bold transition-colors flex items-center gap-1.5 border border-[#E7DCD0] cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
-                <span>طباعة</span>
+                <span>طباعة الفاتورة</span>
               </button>
             </div>
 

@@ -3,6 +3,7 @@ import { Category as CategoryType } from '@/types';
 
 const CategorySchema = new Schema<CategoryType>(
   {
+    _id: { type: String },
     name: { type: String, required: true },
     nameEn: { type: String },
     slug: { type: String, required: true, unique: true, index: true },

@@ -26,17 +26,21 @@ export default function MainLayoutWrapper({ children, settings }: MainLayoutWrap
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-16 lg:pb-0">
-      <Suspense fallback={null}>
-        <RouteProgressBar />
-      </Suspense>
-      <Header settings={settings} />
-      <main className="flex-1">{children}</main>
-      <Footer settings={settings} />
-      <CartDrawer />
-      <FloatingWhatsApp phoneNumber={settings?.whatsapp || settings?.phone} />
-      <PromoCouponPopup />
-      <MobileBottomNav whatsappNumber={settings?.whatsapp || settings?.phone} />
+    <div className="flex flex-col min-h-screen pb-16 lg:pb-0 print:pb-0 print:min-h-0 print:block">
+      <div className="no-print print:hidden">
+        <Suspense fallback={null}>
+          <RouteProgressBar />
+        </Suspense>
+        <Header settings={settings} />
+      </div>
+      <main className="flex-1 print:p-0 print:m-0 print:w-full">{children}</main>
+      <div className="no-print print:hidden">
+        <Footer settings={settings} />
+        <CartDrawer />
+        <FloatingWhatsApp phoneNumber={settings?.whatsapp || settings?.phone} />
+        <PromoCouponPopup />
+        <MobileBottomNav whatsappNumber={settings?.whatsapp || settings?.phone} />
+      </div>
     </div>
   );
 }

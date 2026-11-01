@@ -21,6 +21,7 @@ const OrderItemSnapshotSchema = new Schema<OrderItemSnapshot>(
 
 const OrderSchema = new Schema<OrderType>(
   {
+    _id: { type: String },
     orderNumber: { type: String, required: true, unique: true, index: true },
     customer: {
       name: { type: String, required: true },
