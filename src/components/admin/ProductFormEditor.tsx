@@ -16,6 +16,7 @@ import {
   ImageIcon,
 } from 'lucide-react';
 import { Product, ProductVariant, ProductImage, Category, SaleMethod, DiscountType } from '@/types';
+import { uploadMultipleFilesSafe } from '@/lib/client-image-compressor';
 
 interface ProductFormEditorProps {
   initialProduct?: Product;
@@ -111,7 +112,7 @@ export default function ProductFormEditor({
     }
   };
 
-  // Image Upload Handler (Supports multiple files from device at once)
+  // Image Upload Handler (Supports multiple files from device at once, safely chunked & compressed)
   const uploadFilesList = async (files: File[]) => {
     if (files.length === 0) return;
 
@@ -122,44 +123,33 @@ export default function ProductFormEditor({
 
     setUploadingImage(true);
     setUploadWarning('');
-    setUploadProgressText(`جاري رفع ${files.length} صور دفعة واحدة...`);
+    setUploadProgressText(`جاري تهيئة ${files.length} صور للرفع...`);
 
     try {
-      const fd = new FormData();
-      for (const file of files) {
-        fd.append('files', file);
+      const result = await uploadMultipleFilesSafe(
+        files,
+        'hala_alajaweed/products',
+        (progress) => {
+          setUploadProgressText(
+            `جاري ضغط ورفع (${progress.current} من ${progress.total}) — ${progress.percentage}%`
+          );
+        }
+      );
+
+      if (result.succeeded.length > 0) {
+        const newUploaded: ProductImage[] = result.succeeded.map((item, idx) => ({
+          url: item.url,
+          publicId: item.publicId,
+          isPrimary: images.length === 0 && idx === 0,
+          sortOrder: images.length + idx + 1,
+        }));
+
+        setImages((prev) => [...prev, ...newUploaded]);
       }
-      fd.append('folder', 'hala_alajaweed/products');
 
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: fd,
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'فشل رفع الصور');
-      }
-
-      if (data.warning) {
-        setUploadWarning(data.warning);
-      }
-
-      const uploadedList = data.uploaded || [
-        { url: data.url, publicId: data.publicId }
-      ];
-
-      const newUploaded: ProductImage[] = uploadedList.map((item: any, idx: number) => ({
-        url: item.url,
-        publicId: item.publicId,
-        isPrimary: images.length === 0 && idx === 0,
-        sortOrder: images.length + idx + 1,
-      }));
-
-      setImages((prev) => [...prev, ...newUploaded]);
-
-      if (data.failed > 0 && data.errors?.length > 0) {
-        alert(`تم رفع ${data.succeeded} صورة. تعذر رفع:\n${data.errors.join('\n')}`);
+      if (result.failed.length > 0) {
+        const errorList = result.failed.map((f) => `• ${f.fileName}: ${f.reason}`).join('\n');
+        alert(`تم رفع ${result.succeeded.length} من أصل ${files.length} صورة.\n\nتعذر رفع التالي:\n${errorList}`);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'فشل رفع الصور';

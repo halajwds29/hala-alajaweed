@@ -10,11 +10,12 @@ import {
   Search,
   RefreshCw,
   Loader2,
-  Image as ImageIcon,
+  ImageIcon,
   FolderOpen,
   Info,
   ExternalLink,
 } from 'lucide-react';
+import { uploadMultipleFilesSafe } from '@/lib/client-image-compressor';
 
 interface MediaFile {
   name: string;
@@ -58,48 +59,26 @@ export default function AdminMediaLibraryClient() {
     if (fileArray.length === 0) return;
 
     setUploading(true);
-    setUploadProgressText(`جاري رفع ${fileArray.length} صور دفعة واحدة من جهازك...`);
+    setUploadProgressText(`جاري تهيئة ${fileArray.length} صور للرفع...`);
 
     try {
-      // Upload in batches of 15 to stay within server payload limits while being ultra-fast
-      const batchSize = 15;
-      let totalSucceeded = 0;
-      const allErrors: string[] = [];
-
-      for (let i = 0; i < fileArray.length; i += batchSize) {
-        const batch = fileArray.slice(i, i + batchSize);
-        setUploadProgressText(
-          fileArray.length > batchSize
-            ? `جاري معالجة ورفع (${Math.min(i + batch.length, fileArray.length)} من ${fileArray.length})...`
-            : `جاري حفظ الصور المختارة (${batch.length} صورة)...`
-        );
-
-        const formData = new FormData();
-        for (const file of batch) {
-          formData.append('files', file);
+      const result = await uploadMultipleFilesSafe(
+        fileArray,
+        'hala_alajaweed/media',
+        (progress) => {
+          setUploadProgressText(
+            `جاري ضغط ورفع (${progress.current} من ${progress.total}) — ${progress.percentage}%`
+          );
         }
-        formData.append('folder', 'hala_alajaweed/media');
-
-        const res = await fetch('/api/admin/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          throw new Error(data.error || 'فشل رفع الصور');
-        }
-
-        totalSucceeded += data.succeeded || data.uploaded?.length || 1;
-        if (data.errors && data.errors.length > 0) {
-          allErrors.push(...data.errors);
-        }
-      }
+      );
 
       await fetchFiles();
 
-      if (allErrors.length > 0) {
-        alert(`تم رفع ${totalSucceeded} صورة بنجاح.\nبعض الملفات لم تُرفع:\n${allErrors.join('\n')}`);
+      if (result.failed.length > 0) {
+        const errorList = result.failed.map((f) => `• ${f.fileName}: ${f.reason}`).join('\n');
+        alert(
+          `تم رفع ${result.succeeded.length} من أصل ${fileArray.length} صورة.\n\nالصور التي تعذر رفعها:\n${errorList}`
+        );
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'فشل رفع الصور';

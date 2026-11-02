@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Upload, Trash2, CheckCircle2, AlertCircle, Loader2, Image as ImageIcon, Link as LinkIcon, RefreshCw } from 'lucide-react';
+import { uploadSingleFileSafe } from '@/lib/client-image-compressor';
 
 interface DeviceImageUploaderProps {
   value?: string;
@@ -45,31 +46,16 @@ export default function DeviceImageUploader({
       return;
     }
 
-    // Validate size (max 8MB)
-    if (file.size > 8 * 1024 * 1024) {
-      setErrorMessage('حجم الصورة كبير جداً. الحد الأقصى المسموح به هو 8 ميجابايت.');
-      return;
-    }
-
     setUploading(true);
     setErrorMessage('');
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', folder);
-
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'فشل رفع الصورة من جهازك');
+      const result = await uploadSingleFileSafe(file, folder);
+      if (!result.success || !result.item) {
+        throw new Error(result.error || 'فشل رفع الصورة من جهازك');
       }
 
-      onChange(data.url);
+      onChange(result.item.url);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'حدث خطأ أثناء رفع الصورة';
       setErrorMessage(msg);
