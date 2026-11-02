@@ -20,11 +20,11 @@ export default function CategoriesMarquee({ categories }: CategoriesMarqueeProps
   };
 
   const handleTouchEnd = () => {
-    // Keep paused for 4.5 seconds after release so customer has time to click/review
+    // Keep paused for 6 seconds after release so customer has ample time to click/review
     if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
     pauseTimeoutRef.current = setTimeout(() => {
       setIsPaused(false);
-    }, 4500);
+    }, 6000);
   };
 
   React.useEffect(() => {
@@ -105,7 +105,7 @@ export default function CategoriesMarquee({ categories }: CategoriesMarqueeProps
           className="animate-categories-ltr flex shrink-0"
           style={{
             animationPlayState: isPaused ? 'paused' : 'running',
-            animationDuration: '95s',
+            animationDuration: '160s',
           }}
         >
           {/* Primary Infinite Track Group */}

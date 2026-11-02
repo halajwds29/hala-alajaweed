@@ -122,7 +122,7 @@
 .animate-categories-rtl {
   display: flex;
   width: max-content;
-  animation: categoriesSlideRTL 95s linear infinite;
+  animation: categoriesSlideRTL 160s linear infinite;
   will-change: transform;
   contain: layout paint;
 }
@@ -135,7 +135,7 @@
 .animate-categories-ltr {
   display: flex;
   width: max-content;
-  animation: categoriesSlideLTR 95s linear infinite;
+  animation: categoriesSlideLTR 160s linear infinite;
   will-change: transform;
   contain: layout paint;
 }
