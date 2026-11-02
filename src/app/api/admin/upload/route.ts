@@ -37,7 +37,13 @@ export async function POST(req: NextRequest) {
     }
 
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    await fs.mkdir(uploadsDir, { recursive: true });
+
+    // Attempt to prepare uploads directory (safely ignored if filesystem is read-only on serverless)
+    try {
+      await fs.mkdir(uploadsDir, { recursive: true });
+    } catch {
+      // Ignore read-only filesystem on Vercel/Serverless
+    }
 
     const results: Array<{
       name: string;
@@ -82,24 +88,40 @@ export async function POST(req: NextRequest) {
         const fileName = `${Date.now()}-${randomSalt}-${cleanBase}${ext}`;
         const filePath = path.join(uploadsDir, fileName);
 
-        // Always save to local public/uploads directory so it immediately appears in the media library
-        await fs.writeFile(filePath, buffer);
+        let finalUrl = '';
+        let publicId = '';
+        let source = '';
 
-        let finalUrl = `/uploads/${fileName}`;
-        let publicId = `local-${fileName}`;
-        let source = 'local';
-
-        // Optional Cloudinary upload if configured and connected
+        // 1. PRIMARY: Upload directly to Cloudinary (Production CDN / Vercel compatible)
         try {
-          const cloudCheck = await checkCloudinaryConnection();
-          if (cloudCheck.connected) {
-            const uploadRes = await uploadImageBuffer(buffer, folder);
-            finalUrl = uploadRes.url;
-            publicId = uploadRes.publicId;
-            source = 'cloudinary';
-          }
+          const uploadRes = await uploadImageBuffer(buffer, folder);
+          finalUrl = uploadRes.url;
+          publicId = uploadRes.publicId;
+          source = 'cloudinary';
         } catch (cloudErr) {
-          console.warn(`Cloudinary sync skipped for ${file.name}, using local copy:`, cloudErr);
+          console.warn(`Cloudinary upload failed for ${file.name}, trying local:`, cloudErr);
+        }
+
+        // 2. SECONDARY / CACHE: Attempt to write to local public/uploads (if filesystem is writable)
+        try {
+          await fs.writeFile(filePath, buffer);
+          if (!finalUrl) {
+            finalUrl = `/uploads/${fileName}`;
+            publicId = `local-${fileName}`;
+            source = 'local';
+          }
+        } catch (fsErr) {
+          // On Vercel / Serverless, filesystem is read-only. This is completely expected.
+          console.info(`Local file write skipped on serverless for ${file.name}`);
+        }
+
+        // 3. FALLBACK: If Cloudinary and local filesystem both failed (e.g. offline and read-only)
+        if (!finalUrl) {
+          // As emergency fallback, generate data URI so the user never loses their uploaded product photo
+          const mimeType = file.type || 'image/jpeg';
+          finalUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
+          publicId = `data-uri-${Date.now()}-${randomSalt}`;
+          source = 'inline';
         }
 
         results.push({
@@ -153,7 +175,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: unknown) {
     console.error('Upload API error:', err);
-    const msg = err instanceof Error ? err.message : 'فشل رفع الصور';
+    const msg = err instanceof Error ? err.message : 'حدث خطأ في الخادم أثناء رفع الملف';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
@@ -162,32 +184,42 @@ export async function DELETE(req: NextRequest) {
   try {
     const isAuthed = await checkAdminAuthApi(req);
     if (!isAuthed) {
-      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
+      return NextResponse.json({ error: 'غير مصرح لك بالوصول' }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const publicId = searchParams.get('publicId');
 
     if (!publicId) {
-      return NextResponse.json({ error: 'معرف الصورة مطلوب' }, { status: 400 });
+      return NextResponse.json({ error: 'المعرف المطلوب حذفه غير محدد' }, { status: 400 });
     }
 
-    // If local file
+    // If local file, attempt to remove from public/uploads
     if (publicId.startsWith('local-')) {
       const fileName = publicId.replace('local-', '');
-      const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+      const filePath = path.join(process.cwd(), 'public', 'uploads', path.basename(fileName));
       try {
         await fs.unlink(filePath);
       } catch {
-        // file may already not exist
+        // file might not exist or read-only
       }
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, message: 'تم حذف الصورة المحلية' });
     }
 
+    // If data URI, nothing to delete on server
+    if (publicId.startsWith('data-uri-')) {
+      return NextResponse.json({ success: true, message: 'تم إزالة الصورة' });
+    }
+
+    // Cloudinary delete
     const deleted = await deleteImage(publicId);
-    return NextResponse.json({ success: deleted });
+    if (!deleted) {
+      return NextResponse.json({ error: 'فشل حذف الصورة من السحابة' }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, message: 'تم حذف الصورة بنجاح من السحابة' });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'فشل حذف الصورة';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error('Delete API error:', err);
+    return NextResponse.json({ error: 'حدث خطأ أثناء محاولة الحذف' }, { status: 500 });
   }
 }

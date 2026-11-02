@@ -20,9 +20,11 @@ import { uploadMultipleFilesSafe } from '@/lib/client-image-compressor';
 interface MediaFile {
   name: string;
   url: string;
+  publicId?: string;
   size: number;
   createdAt: string;
   modifiedAt: string;
+  source?: string;
 }
 
 export default function AdminMediaLibraryClient() {
@@ -90,16 +92,20 @@ export default function AdminMediaLibraryClient() {
     }
   };
 
-  const handleDelete = async (fileName: string) => {
-    if (!confirm(`هل أنت متأكد من حذف الصورة «${fileName}» نهائياً من الخادم؟`)) return;
+  const handleDelete = async (file: MediaFile) => {
+    if (!confirm(`هل أنت متأكد من حذف الصورة «${file.name}» نهائياً؟`)) return;
 
     try {
-      const res = await fetch(`/api/admin/media?fileName=${encodeURIComponent(fileName)}`, {
+      const params = new URLSearchParams();
+      if (file.name) params.set('fileName', file.name);
+      if (file.publicId) params.set('publicId', file.publicId);
+
+      const res = await fetch(`/api/admin/media?${params.toString()}`, {
         method: 'DELETE',
       });
       const data = await res.json();
       if (data.success) {
-        setFiles((prev) => prev.filter((f) => f.name !== fileName));
+        setFiles((prev) => prev.filter((f) => f.name !== file.name && f.url !== file.url));
       } else {
         alert(data.error || 'فشل حذف الملف');
       }
@@ -332,7 +338,7 @@ export default function AdminMediaLibraryClient() {
 
                   <button
                     type="button"
-                    onClick={() => handleDelete(file.name)}
+                    onClick={() => handleDelete(file)}
                     className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 transition-colors"
                     title="حذف الصورة"
                   >

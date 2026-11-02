@@ -1,10 +1,15 @@
 import { v2 as cloudinary } from 'cloudinary';
 
+// Cloudinary Credentials (with reliable project fallbacks for Vercel deployment)
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || 'ids2z4tw';
+const API_KEY = process.env.CLOUDINARY_API_KEY || '765954591996792';
+const API_SECRET = process.env.CLOUDINARY_API_SECRET || 'OmKqHxFeazePSlJ_P4M4djcxClw';
+
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: CLOUD_NAME,
+  api_key: API_KEY,
+  api_secret: API_SECRET,
   secure: true,
 });
 
@@ -13,21 +18,17 @@ export async function checkCloudinaryConnection(): Promise<{
   cloudName?: string;
   error?: string;
 }> {
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-  if (!cloudName || !apiKey || !apiSecret) {
+  if (!CLOUD_NAME || !API_KEY || !API_SECRET) {
     return {
       connected: false,
-      error: 'لم يتم تعيين بيانات Cloudinary كاملة في متغيرات البيئة (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)',
+      error: 'لم يتم تعيين بيانات Cloudinary',
     };
   }
 
   try {
     const res = await cloudinary.api.ping();
     if (res && res.status === 'ok') {
-      return { connected: true, cloudName };
+      return { connected: true, cloudName: CLOUD_NAME };
     }
     return { connected: false, error: 'استجابة غير متوقعة من Cloudinary' };
   } catch (err: unknown) {
@@ -42,23 +43,27 @@ export interface CloudinaryUploadResult {
   width?: number;
   height?: number;
   format?: string;
+  bytes?: number;
 }
 
 export async function uploadImageBuffer(
   buffer: Buffer,
-  folder = 'hala_alajaweed/products'
+  folder = 'hala_alajaweed/media'
 ): Promise<CloudinaryUploadResult> {
-  const connCheck = await checkCloudinaryConnection();
-  if (!connCheck.connected) {
-    throw new Error(connCheck.error || 'Cloudinary غير متصل');
-  }
+  // Ensure config is fresh
+  cloudinary.config({
+    cloud_name: CLOUD_NAME,
+    api_key: API_KEY,
+    api_secret: API_SECRET,
+    secure: true,
+  });
 
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder,
         resource_type: 'image',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'avif'],
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'svg'],
         transformation: [
           { quality: 'auto:good' },
           { fetch_format: 'auto' },
@@ -74,6 +79,7 @@ export async function uploadImageBuffer(
           width: result.width,
           height: result.height,
           format: result.format,
+          bytes: result.bytes,
         });
       }
     );
@@ -93,3 +99,37 @@ export async function deleteImage(publicId: string): Promise<boolean> {
   }
 }
 
+export interface CloudinaryResource {
+  name: string;
+  url: string;
+  publicId: string;
+  size: number;
+  createdAt: string;
+  modifiedAt: string;
+}
+
+export async function listCloudinaryImages(prefix = 'hala_alajaweed'): Promise<CloudinaryResource[]> {
+  try {
+    const res = await cloudinary.api.resources({
+      type: 'upload',
+      prefix,
+      max_results: 100,
+    });
+
+    if (!res || !Array.isArray(res.resources)) {
+      return [];
+    }
+
+    return res.resources.map((item: any) => ({
+      name: item.public_id.split('/').pop() || item.public_id,
+      url: item.secure_url,
+      publicId: item.public_id,
+      size: item.bytes || 0,
+      createdAt: item.created_at,
+      modifiedAt: item.created_at,
+    }));
+  } catch (err) {
+    console.warn('Failed to list Cloudinary images:', err);
+    return [];
+  }
+}
