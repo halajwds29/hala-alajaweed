@@ -704,7 +704,7 @@ export const initialSiteSettings: SiteSettings = {
   wholesaleImageUrl: '/images/hero-patisserie.jpg',
   phone: '+966546002435',
   whatsapp: '+966546002435',
-  email: 'halajwds@gmail.com',
+  email: 'info@halajwds.com',
   address: 'حائل — حي النقرة — المملكة العربية السعودية',
   secondaryAddress: 'الرياض — مركز التوريد وخدمة المناسبات — شحن سريع ومبرد',
   additionalAddresses: [

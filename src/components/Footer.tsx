@@ -143,7 +143,7 @@ export default function Footer({ settings }: FooterProps) {
                 <strong className="text-white">المعرف الموحد:</strong> @halajwds
               </p>
               <p>
-                <strong className="text-white">البريد الإلكتروني:</strong> {settings?.email || 'halajwds@gmail.com'}
+                <strong className="text-white">البريد الإلكتروني:</strong> {settings?.email || 'info@halajwds.com'}
               </p>
               <p className="font-mono dir-ltr text-right">
                 <strong className="text-white font-sans">الجوال:</strong> {phone}

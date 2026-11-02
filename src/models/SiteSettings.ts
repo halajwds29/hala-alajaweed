@@ -22,7 +22,7 @@ const SiteSettingsSchema = new Schema<SiteSettingsType>(
     wholesaleImageUrl: { type: String, default: '/images/hero-patisserie.jpg' },
     phone: { type: String, default: '+966546002435' },
     whatsapp: { type: String, default: '+966546002435' },
-    email: { type: String, default: 'halajwds@gmail.com' },
+    email: { type: String, default: 'info@halajwds.com' },
     address: { type: String, default: 'حائل — حي النقرة — المملكة العربية السعودية' },
     secondaryAddress: {
       type: String,

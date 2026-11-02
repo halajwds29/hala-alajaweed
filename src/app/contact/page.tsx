@@ -11,6 +11,9 @@ import {
   ExternalLink,
   Globe,
   Share2,
+  Loader2,
+  MessageCircle,
+  AlertCircle,
 } from 'lucide-react';
 import InteractiveBranchesMap from '@/components/InteractiveBranchesMap';
 
@@ -18,10 +21,13 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    subject: 'استفسار عام',
+    email: '',
+    subject: 'استفسار عام عن الحلويات',
     message: '',
   });
 
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [siteSettings, setSiteSettings] = useState<any>(null);
 
@@ -38,26 +44,57 @@ export default function ContactPage() {
 
   const phone = siteSettings?.phone || '0546002435';
   const whatsapp = siteSettings?.whatsapp || '0546002435';
-  const email = siteSettings?.email || 'halajwds@gmail.com';
+  const email = siteSettings?.email || 'info@halajwds.com';
   const address = siteSettings?.address || 'حائل — حي النقرة — طريق الملك عبدالعزيز';
   const secondaryAddress = siteSettings?.secondaryAddress || 'الرياض — العريجاء الغربية — شارع مارية القبطية — مبنى 7218';
   const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, '');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.phone || !formData.message) return;
-
-    // Build direct WhatsApp pre-filled message URL
+  const openWhatsApp = () => {
     const text = encodeURIComponent(
       `*رسالة جديدة من موقع حلا الأجاويد*\n` +
       `*الاسم:* ${formData.name}\n` +
       `*الجوال:* ${formData.phone}\n` +
+      (formData.email ? `*الإيميل:* ${formData.email}\n` : '') +
       `*الموضوع:* ${formData.subject}\n` +
       `*الرسالة:* ${formData.message}`
     );
 
     window.open(`https://wa.me/${cleanWhatsapp || '966546002435'}?text=${text}`, '_blank');
-    setSubmitted(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.message.trim()) {
+      alert('يرجى تعبئة الحقول المطلوبة (الاسم، رقم الجوال، نص الرسالة).');
+      return;
+    }
+
+    setIsSending(true);
+    setSendError('');
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'تعذر إرسال الرسالة إلى البريد الإلكتروني');
+      }
+
+      setSubmitted(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'تعذر إرسال الرسالة حالياً. يمكنك المتابعة عبر واتساب مباشرة.';
+      setSendError(msg);
+      // Offer WhatsApp fallback
+      if (confirm(`${msg}\n\nهل ترغب في فتح محادثة فورية عبر واتساب الآن لنقل رسالتك؟`)) {
+        openWhatsApp();
+      }
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const socialLinks = [
@@ -235,23 +272,57 @@ export default function ContactPage() {
             </h2>
 
             {submitted ? (
-              <div className="p-8 text-center bg-[#FAF6F0] rounded-2xl border border-[#EBE3D7] space-y-3">
-                <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-6 h-6" />
+              <div className="p-8 text-center bg-[#FAF6F0] rounded-2xl border border-[#EBE3D7] space-y-4">
+                <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
+                  <CheckCircle2 className="w-7 h-7" />
                 </div>
-                <h3 className="font-bold text-base text-[#4A1D2E]">شكراً لتواصلكم الكريم</h3>
-                <p className="text-xs text-[#6B5E62]">
-                  تم تجهيز رسالتكم ونقلها لواتساب المؤسسة لسرعة الرد والمتابعة.
+                <div className="space-y-1">
+                  <h3 className="font-bold text-lg text-[#4A1D2E]">تم إرسال رسالتكم بنجاح!</h3>
+                  <p className="text-xs sm:text-sm text-[#682D43] font-semibold">
+                    وصلت رسالتكم مباشرة إلى البريد الإلكتروني:{' '}
+                    <span className="font-mono dir-ltr font-bold text-[#4A1D2E] underline">info@halajwds.com</span>
+                  </p>
+                </div>
+                <p className="text-xs text-[#6B5E62] max-w-md mx-auto leading-relaxed">
+                  فريق خدمة العملاء والمبيعات في مؤسسة حلا الأجاويد في خدمتكم، وسيقوم بالرد على استفساركم أو طلبكم في أقرب وقت ممكن.
                 </p>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="px-5 py-2.5 bg-[#682D43] text-white rounded-full text-xs font-bold"
-                >
-                  إرسال رسالة أخرى
-                </button>
+
+                <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={openWhatsApp}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>متابعة فورية عبر واتساب</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSubmitted(false);
+                      setFormData({
+                        name: '',
+                        phone: '',
+                        email: '',
+                        subject: 'استفسار عام عن الحلويات',
+                        message: '',
+                      });
+                    }}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-[#682D43] hover:bg-[#522234] text-white rounded-full text-xs font-bold transition-colors"
+                  >
+                    إرسال رسالة أخرى
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {sendError && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{sendError}</span>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-[#4A1D2E] mb-1">
@@ -283,21 +354,37 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-[#4A1D2E] mb-1">
-                    الموضوع أو نوع الطلب
-                  </label>
-                  <select
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#EBE3D7] focus:outline-none focus:border-[#682D43] text-xs bg-[#FAF6F0] font-medium"
-                  >
-                    <option value="استفسار عام عن الحلويات">استفسار عام عن الحلويات</option>
-                    <option value="طلب تسعيرة جملة للمقاهي والفنادق">طلب تسعيرة جملة للمقاهي والفنادق</option>
-                    <option value="تجهيز صواني وبوكسات مناسبات وأفراح">تجهيز صواني وبوكسات مناسبات وأفراح</option>
-                    <option value="متابعة حالة شحنة سابقة">متابعة حالة شحنة سابقة</option>
-                    <option value="اقتراح أو ملاحظة">اقتراح أو ملاحظة</option>
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#4A1D2E] mb-1">
+                      البريد الإلكتروني للرد <span className="text-[#9F6A76] font-normal">(اختياري)</span>
+                    </label>
+                    <input
+                      type="email"
+                      dir="ltr"
+                      placeholder="name@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-[#EBE3D7] focus:outline-none focus:border-[#682D43] text-xs bg-[#FAF6F0] font-mono text-right"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#4A1D2E] mb-1">
+                      الموضوع أو نوع الطلب
+                    </label>
+                    <select
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-[#EBE3D7] focus:outline-none focus:border-[#682D43] text-xs bg-[#FAF6F0] font-medium"
+                    >
+                      <option value="استفسار عام عن الحلويات">استفسار عام عن الحلويات</option>
+                      <option value="طلب تسعيرة جملة للمقاهي والفنادق">طلب تسعيرة جملة للمقاهي والفنادق</option>
+                      <option value="تجهيز صواني وبوكسات مناسبات وأفراح">تجهيز صواني وبوكسات مناسبات وأفراح</option>
+                      <option value="متابعة حالة شحنة سابقة">متابعة حالة شحنة سابقة</option>
+                      <option value="اقتراح أو ملاحظة">اقتراح أو ملاحظة</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -314,13 +401,29 @@ export default function ContactPage() {
                   ></textarea>
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-3 px-6 rounded-full bg-[#682D43] hover:bg-[#522234] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>إرسال وتأكيد عبر واتساب</span>
-                </button>
+                <div className="pt-1">
+                  <button
+                    type="submit"
+                    disabled={isSending}
+                    className="w-full py-3 px-6 rounded-full bg-[#682D43] hover:bg-[#522234] disabled:opacity-70 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer"
+                  >
+                    {isSending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>جاري إرسال الرسالة إلى info@halajwds.com...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>إرسال الرسالة إلى info@halajwds.com</span>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-[10px] text-center text-[#9F6A76] mt-2">
+                    يتم استلام رسائلكم مباشرة عبر البريد الإلكتروني الرسمي{' '}
+                    <span className="font-mono font-bold text-[#4A1D2E]">info@halajwds.com</span> مع إمكانية المتابعة الفورية عبر واتساب
+                  </p>
+                </div>
               </form>
             )}
           </div>
