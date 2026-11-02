@@ -115,48 +115,52 @@ export default function ProductFormEditor({
   const uploadFilesList = async (files: File[]) => {
     if (files.length === 0) return;
 
-    if (images.length + files.length > 20) {
-      alert(`الحد الأقصى المسموح به هو 20 صورة لكل منتج. يمكنك إضافة حتى ${Math.max(0, 20 - images.length)} صورة إضافية.`);
+    if (images.length + files.length > 25) {
+      alert(`الحد الأقصى المسموح به هو 25 صورة لكل منتج. يمكنك إضافة حتى ${Math.max(0, 25 - images.length)} صورة إضافية.`);
       return;
     }
 
     setUploadingImage(true);
     setUploadWarning('');
+    setUploadProgressText(`جاري رفع ${files.length} صور دفعة واحدة...`);
 
     try {
-      const newUploaded: ProductImage[] = [];
+      const fd = new FormData();
+      for (const file of files) {
+        fd.append('files', file);
+      }
+      fd.append('folder', 'hala_alajaweed/products');
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        setUploadProgressText(`جاري رفع الصورة ${i + 1} من ${files.length}: ${file.name}`);
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: fd,
+      });
 
-        const fd = new FormData();
-        fd.append('file', file);
-        fd.append('folder', 'hala_alajaweed/products');
-
-        const res = await fetch('/api/admin/upload', {
-          method: 'POST',
-          body: fd,
-        });
-
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          throw new Error(data.error || `فشل رفع الصورة: ${file.name}`);
-        }
-
-        if (data.warning) {
-          setUploadWarning(data.warning);
-        }
-
-        newUploaded.push({
-          url: data.url,
-          publicId: data.publicId,
-          isPrimary: images.length === 0 && newUploaded.length === 0, // First uploaded image is primary by default
-          sortOrder: images.length + newUploaded.length + 1,
-        });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل رفع الصور');
       }
 
+      if (data.warning) {
+        setUploadWarning(data.warning);
+      }
+
+      const uploadedList = data.uploaded || [
+        { url: data.url, publicId: data.publicId }
+      ];
+
+      const newUploaded: ProductImage[] = uploadedList.map((item: any, idx: number) => ({
+        url: item.url,
+        publicId: item.publicId,
+        isPrimary: images.length === 0 && idx === 0,
+        sortOrder: images.length + idx + 1,
+      }));
+
       setImages((prev) => [...prev, ...newUploaded]);
+
+      if (data.failed > 0 && data.errors?.length > 0) {
+        alert(`تم رفع ${data.succeeded} صورة. تعذر رفع:\n${data.errors.join('\n')}`);
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'فشل رفع الصور';
       alert(msg);
@@ -557,7 +561,7 @@ export default function ProductFormEditor({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/png, image/jpeg, image/webp, image/avif"
+                accept="image/*"
                 multiple
                 onChange={handleImageUpload}
                 disabled={uploadingImage}

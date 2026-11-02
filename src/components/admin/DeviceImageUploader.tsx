@@ -244,7 +244,7 @@ export default function DeviceImageUploader({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/png, image/jpeg, image/webp, image/avif"
+        accept="image/*"
         onChange={handleInputChange}
         className="hidden"
       />

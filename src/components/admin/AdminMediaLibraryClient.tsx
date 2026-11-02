@@ -58,13 +58,26 @@ export default function AdminMediaLibraryClient() {
     if (fileArray.length === 0) return;
 
     setUploading(true);
+    setUploadProgressText(`جاري رفع ${fileArray.length} صور دفعة واحدة من جهازك...`);
+
     try {
-      for (let i = 0; i < fileArray.length; i++) {
-        const file = fileArray[i];
-        setUploadProgressText(`جاري رفع ${i + 1} من ${fileArray.length}: ${file.name}`);
+      // Upload in batches of 15 to stay within server payload limits while being ultra-fast
+      const batchSize = 15;
+      let totalSucceeded = 0;
+      const allErrors: string[] = [];
+
+      for (let i = 0; i < fileArray.length; i += batchSize) {
+        const batch = fileArray.slice(i, i + batchSize);
+        setUploadProgressText(
+          fileArray.length > batchSize
+            ? `جاري معالجة ورفع (${Math.min(i + batch.length, fileArray.length)} من ${fileArray.length})...`
+            : `جاري حفظ الصور المختارة (${batch.length} صورة)...`
+        );
 
         const formData = new FormData();
-        formData.append('file', file);
+        for (const file of batch) {
+          formData.append('files', file);
+        }
         formData.append('folder', 'hala_alajaweed/media');
 
         const res = await fetch('/api/admin/upload', {
@@ -74,14 +87,24 @@ export default function AdminMediaLibraryClient() {
 
         const data = await res.json();
         if (!res.ok || !data.success) {
-          throw new Error(data.error || `فشل رفع ${file.name}`);
+          throw new Error(data.error || 'فشل رفع الصور');
+        }
+
+        totalSucceeded += data.succeeded || data.uploaded?.length || 1;
+        if (data.errors && data.errors.length > 0) {
+          allErrors.push(...data.errors);
         }
       }
 
       await fetchFiles();
+
+      if (allErrors.length > 0) {
+        alert(`تم رفع ${totalSucceeded} صورة بنجاح.\nبعض الملفات لم تُرفع:\n${allErrors.join('\n')}`);
+      }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'فشل رفع الملفات';
+      const msg = err instanceof Error ? err.message : 'فشل رفع الصور';
       alert(msg);
+      await fetchFiles();
     } finally {
       setUploading(false);
       setUploadProgressText('');
@@ -181,10 +204,12 @@ export default function AdminMediaLibraryClient() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/png, image/jpeg, image/webp, image/avif"
+          accept="image/*"
           multiple
           onChange={(e) => {
-            if (e.target.files) handleUploadFiles(e.target.files);
+            if (e.target.files && e.target.files.length > 0) {
+              handleUploadFiles(e.target.files);
+            }
             e.target.value = '';
           }}
           className="hidden"
@@ -208,7 +233,7 @@ export default function AdminMediaLibraryClient() {
                 انقر هنا لاختيار صور من جهازك أو اسحبها وأفلتها هنا
               </h3>
               <p className="text-xs text-[#6E6468] mt-1">
-                يدعم رفع عدة صور دفعة واحدة بصيغ (JPG, PNG, WebP, AVIF) حتى 8 ميجابايت لكل صورة
+                يدعم رفع عدة صور دفعة واحدة بدون حد أقصى للعدد بصيغ (JPG, PNG, WebP, AVIF, HEIC) حتى 20 ميجابايت لكل صورة
               </p>
             </div>
             <div className="pt-2">
