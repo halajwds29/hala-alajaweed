@@ -58,9 +58,9 @@ export async function POST(req: NextRequest) {
       username: result.username,
     });
 
-    // Refresh admin session cookie with the updated username
+    // Refresh admin session cookie with the updated username and new tokenVersion
     if (result.username) {
-      await setAdminSession(response, result.username);
+      await setAdminSession(response, result.username, result.tokenVersion);
     }
 
     return response;

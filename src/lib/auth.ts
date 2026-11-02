@@ -10,26 +10,31 @@ const JWT_SECRET = new TextEncoder().encode(
 const COOKIE_NAME = 'hala_admin_session';
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10);
+  return bcrypt.hash(password, 12);
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
-export async function createAdminToken(username: string): Promise<string> {
-  return new SignJWT({ username, role: 'admin' })
+export async function createAdminToken(username: string, tokenVersion = 1): Promise<string> {
+  return new SignJWT({ username, role: 'admin', tokenVersion })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime('24h') // 24 hours strict validity
     .sign(JWT_SECRET);
 }
 
-export async function verifyAdminToken(token: string): Promise<{ username: string } | null> {
+export async function verifyAdminToken(
+  token: string
+): Promise<{ username: string; tokenVersion?: number } | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     if (payload.role === 'admin' && typeof payload.username === 'string') {
-      return { username: payload.username };
+      return {
+        username: payload.username,
+        tokenVersion: typeof payload.tokenVersion === 'number' ? payload.tokenVersion : 1,
+      };
     }
     return null;
   } catch {
@@ -37,7 +42,7 @@ export async function verifyAdminToken(token: string): Promise<{ username: strin
   }
 }
 
-export async function getAdminSession(): Promise<{ username: string } | null> {
+export async function getAdminSession(): Promise<{ username: string; tokenVersion?: number } | null> {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(COOKIE_NAME)?.value;
@@ -48,18 +53,21 @@ export async function getAdminSession(): Promise<{ username: string } | null> {
   }
 }
 
-export async function setAdminSession(response: NextResponse, username: string): Promise<void> {
-  const token = await createAdminToken(username);
+export async function setAdminSession(
+  response: NextResponse,
+  username: string,
+  tokenVersion = 1
+): Promise<void> {
+  const token = await createAdminToken(username, tokenVersion);
   const isProduction = process.env.NODE_ENV === 'production';
   response.cookies.set({
     name: COOKIE_NAME,
     value: token,
     httpOnly: true,
-    // Use secure cookies in production (HTTPS), plain HTTP for local dev
     secure: isProduction,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24, // 24 hours
   });
 }
 
@@ -93,6 +101,5 @@ export async function checkAdminAuthApi(req: NextRequest): Promise<boolean> {
     if (session !== null) return true;
   }
 
-  // No localhost bypass — every request must carry a valid JWT
   return false;
 }

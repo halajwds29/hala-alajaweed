@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Support 4 or more images (up to 20 images per product)
-    if (body.images && body.images.length > 20) {
+    // Support up to 25 images per product
+    if (body.images && body.images.length > 25) {
       return NextResponse.json(
-        { error: 'الحد الأقصى المسموح به هو 20 صورة لكل منتج' },
+        { error: 'الحد الأقصى المسموح به هو 25 صورة لكل منتج' },
         { status: 400 }
       );
     }

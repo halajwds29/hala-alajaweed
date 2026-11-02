@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getProductById, createOrder, getOrderByNumber } from '@/lib/data-service';
+import {
+  getProductById,
+  createOrder,
+  getOrderByIdempotencyKey,
+  getSiteSettings,
+} from '@/lib/data-service';
 import { calculateEffectivePrice, generateOrderNumber } from '@/lib/utils';
 import { OrderItemSnapshot } from '@/types';
 
@@ -8,9 +13,10 @@ import { OrderItemSnapshot } from '@/types';
 const rateLimitMap = new Map<string, { count: number; firstRequestTime: number }>();
 
 const checkoutSchema = z.object({
-  idempotencyKey: z.string().min(8, 'مفتاح الطلب مطلوب'),
+  idempotencyKey: z.string().min(8, 'مفتاح الطلب مطلوب لمنع التكرار'),
   orderType: z.enum(['retail', 'wholesale']).default('retail'),
   deliveryMethod: z.enum(['delivery', 'pickup']).default('delivery'),
+  promoCode: z.string().optional(),
   customer: z.object({
     name: z.string().optional().default('عميل حلا الأجاويد'),
     phone: z.string().min(8, 'يرجى إدخال رقم جوال صحيح لا يقل عن 8 أرقام').max(20, 'رقم الجوال طويل جداً'),
@@ -32,12 +38,11 @@ const checkoutSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     // 1. Basic Rate Limiting
-    const ip = req.headers.get('x-forwarded-for') || 'local';
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
     const now = Date.now();
     const rateData = rateLimitMap.get(ip) || { count: 0, firstRequestTime: now };
 
     if (now - rateData.firstRequestTime > 60000) {
-      // Reset window after 1 minute
       rateData.count = 1;
       rateData.firstRequestTime = now;
       rateLimitMap.set(ip, rateData);
@@ -60,13 +65,39 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: firstError }, { status: 400 });
     }
 
-    const { idempotencyKey, customer, orderType, deliveryMethod, customerNotes, items } =
-      parseResult.data;
+    const {
+      idempotencyKey,
+      customer,
+      orderType,
+      deliveryMethod,
+      promoCode,
+      customerNotes,
+      items,
+    } = parseResult.data;
 
-    // 3. Prevent duplicate order with idempotency check
-    // (If order was already submitted with this idempotency key, return existing order)
-    // We can query existing orders
-    // 4. Server-Side Price & Stock Verification
+    // 3. IDEMPOTENCY CHECK (Point 4: Prevent double-click duplicates)
+    const existingOrder = await getOrderByIdempotencyKey(idempotencyKey);
+    if (existingOrder) {
+      return NextResponse.json({
+        success: true,
+        orderNumber: existingOrder.orderNumber,
+        order: existingOrder,
+        isReplay: true,
+      });
+    }
+
+    // 4. Fetch Dynamic Store Settings (Point 5: Alignment with Admin Settings)
+    const siteSettings = await getSiteSettings();
+
+    // Check if store is open
+    if (siteSettings.isStoreOpen === false) {
+      return NextResponse.json(
+        { error: 'نعتذر منكم، استقبال الطلبات متوقف مؤقتاً في المتجر. يرجى المحاولة لاحقاً أو التواصل معنا عبر واتساب.' },
+        { status: 400 }
+      );
+    }
+
+    // 5. Server-Side Price & Stock Verification
     const validatedItems: OrderItemSnapshot[] = [];
     let serverSubtotal = 0;
     let serverDiscountTotal = 0;
@@ -75,7 +106,7 @@ export async function POST(req: NextRequest) {
       const product = await getProductById(item.productId);
       if (!product) {
         return NextResponse.json(
-          { error: `المنتج المحدد لم يعد متوفراً في المتجر.` },
+          { error: 'أحد المنتجات المحددة في السلة لم يعد متوفراً في المتجر.' },
           { status: 400 }
         );
       }
@@ -95,9 +126,9 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const isWholesaleActive = (orderType === 'wholesale' || item.isWholesale) && variant.isWholesaleAvailable;
+      const isWholesaleActive =
+        (orderType === 'wholesale' || item.isWholesale) && variant.isWholesaleAvailable;
 
-      // Check wholesale minimum requirement
       if (isWholesaleActive && item.quantity < variant.minWholesaleQty) {
         return NextResponse.json(
           {
@@ -119,7 +150,7 @@ export async function POST(req: NextRequest) {
       const primaryImg =
         product.images.find((i) => i.isPrimary)?.url ||
         product.images[0]?.url ||
-        '';
+        '/images/products/baklava-real.jpg';
 
       validatedItems.push({
         productId: product._id,
@@ -137,18 +168,40 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Delivery fee calculation
-    // Pickup is always 0
+    // 6. Server-Side Promo Code Verification (Point 5)
+    let promoDiscountAmount = 0;
+    if (promoCode && promoCode.trim()) {
+      const cleanInputCode = promoCode.trim().toUpperCase();
+      const promoConfig = siteSettings.promoPopup;
+
+      if (promoConfig && promoConfig.enabled) {
+        const configuredCode = (promoConfig.code || 'AJAWEED10').trim().toUpperCase();
+        if (cleanInputCode === configuredCode || cleanInputCode === 'AJAWEED10') {
+          const discountPercent = promoConfig.discountPercent || 10;
+          const netItemsPrice = Math.max(0, serverSubtotal - serverDiscountTotal);
+          promoDiscountAmount = (netItemsPrice * discountPercent) / 100;
+          serverDiscountTotal += promoDiscountAmount;
+        }
+      }
+    }
+
+    // 7. Dynamic Delivery Fee Calculation from Store Settings (Point 5)
     let deliveryFee = 0;
     if (deliveryMethod === 'delivery') {
-      // Free delivery if order total is >= 350 SAR, otherwise standard 25 SAR
-      const netProductsTotal = serverSubtotal - serverDiscountTotal;
-      deliveryFee = netProductsTotal >= 350 ? 0 : 25;
+      const netProductsTotal = Math.max(0, serverSubtotal - serverDiscountTotal);
+      const freeThreshold =
+        typeof siteSettings.freeDeliveryThreshold === 'number'
+          ? siteSettings.freeDeliveryThreshold
+          : 350;
+      const standardDeliveryFee =
+        typeof siteSettings.deliveryFee === 'number' ? siteSettings.deliveryFee : 25;
+
+      deliveryFee = netProductsTotal >= freeThreshold ? 0 : standardDeliveryFee;
     }
 
     const finalTotal = Math.max(0, serverSubtotal - serverDiscountTotal + deliveryFee);
 
-    // 5. Generate Order and Save
+    // 8. Generate Order and Save (Point 3: Guaranteed Persistence)
     const orderNumber = generateOrderNumber();
 
     const createdOrder = await createOrder({
@@ -166,15 +219,29 @@ export async function POST(req: NextRequest) {
       idempotencyKey,
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       orderNumber: createdOrder.orderNumber,
       order: createdOrder,
     });
+
+    // 9. Set secure temporary access cookie so legitimate customer can view order details safely (Point 2)
+    const isProduction = process.env.NODE_ENV === 'production';
+    const accessSecret = `tok_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+    response.cookies.set({
+      name: `order_token_${createdOrder.orderNumber}`,
+      value: accessSecret,
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 3, // 3 days
+    });
+
+    return response;
   } catch (err: unknown) {
     console.error('Checkout error:', err);
     const errorMsg = err instanceof Error ? err.message : 'حدث خطأ غير متوقع أثناء معالجة الطلب.';
     return NextResponse.json({ error: errorMsg }, { status: 500 });
   }
 }
-

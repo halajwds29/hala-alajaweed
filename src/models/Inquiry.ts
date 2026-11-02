@@ -32,3 +32,4 @@ const InquirySchema = new Schema<InquiryType>(
 
 export const InquiryModel: Model<InquiryType> =
   mongoose.models.Inquiry || mongoose.model<InquiryType>('Inquiry', InquirySchema);
+

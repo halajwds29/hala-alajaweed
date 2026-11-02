@@ -53,6 +53,19 @@ export default function CheckoutPage() {
   const [idempotencyKey, setIdempotencyKey] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [siteSettings, setSiteSettings] = useState<any>(null);
+
+  // Load public site settings for dynamic delivery fee & thresholds
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.settings) {
+          setSiteSettings(data.settings);
+        }
+      })
+      .catch((err) => console.error('Failed to load site settings for checkout:', err));
+  }, []);
 
   // Generate unique idempotency key once per checkout attempt
   useEffect(() => {
@@ -66,8 +79,10 @@ export default function CheckoutPage() {
     }
   }, [items]);
 
-  // Delivery fee calculation based on effective total after coupon
-  const deliveryFee = formData.deliveryMethod === 'pickup' ? 0 : finalTotal >= 350 ? 0 : 25;
+  // Dynamic delivery fee calculation based on store settings
+  const freeThreshold = siteSettings?.freeDeliveryThreshold ?? 350;
+  const standardFee = siteSettings?.deliveryFee ?? 25;
+  const deliveryFee = formData.deliveryMethod === 'pickup' ? 0 : finalTotal >= freeThreshold ? 0 : standardFee;
   const finalGrandTotal = finalTotal + deliveryFee;
 
   const handleApplyCoupon = async () => {
@@ -124,6 +139,7 @@ export default function CheckoutPage() {
           idempotencyKey,
           orderType: formData.orderType,
           deliveryMethod: formData.deliveryMethod,
+          promoCode: appliedCoupon?.code || undefined,
           customer: {
             name: formData.name.trim() || 'عميل حلا الأجاويد',
             phone: cleanPhone,
@@ -224,7 +240,7 @@ export default function CheckoutPage() {
                 <div className="text-xs">
                   <p className="font-bold text-[#4A1D2E]">توصيل وشحن للعنوان</p>
                   <p className="text-[#6E6468] text-[11px] mt-0.5">
-                    توصيل لكافة مدن المملكة (مجاناً للطلبات فوق 350 ر.س)
+                    توصيل لكافة مدن المملكة (مجاناً للطلبات فوق {freeThreshold} ر.س)
                   </p>
                 </div>
               </label>

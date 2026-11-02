@@ -31,10 +31,10 @@ export async function PUT(req: NextRequest, context: RouteContext) {
     const { id } = await context.params;
     const body = await req.json();
 
-    // Support 4 or more images (up to 20 images per product)
-    if (body.images && body.images.length > 20) {
+    // Support up to 25 images per product
+    if (body.images && body.images.length > 25) {
       return NextResponse.json(
-        { error: 'لا يمكن إضافة أكثر من 20 صورة للمنتج' },
+        { error: 'لا يمكن إضافة أكثر من 25 صورة للمنتج' },
         { status: 400 }
       );
     }

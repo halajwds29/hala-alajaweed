@@ -622,11 +622,36 @@ export async function trackOrder(
   };
 }
 
+export async function getOrderByIdempotencyKey(key: string): Promise<Order | null> {
+  if (!key || typeof key !== 'string') return null;
+  const db = await connectToDatabase();
+  if (db.isConnected) {
+    try {
+      const order = await OrderModel.findOne({ idempotencyKey: key.trim() }).lean();
+      if (order) return JSON.parse(JSON.stringify(order));
+    } catch (err) {
+      console.error('Error finding order by idempotencyKey:', err);
+    }
+  }
+  const memoryOrders = getMemoryOrders();
+  const mem = memoryOrders.find((o) => o.idempotencyKey === key.trim());
+  return mem ? JSON.parse(JSON.stringify(mem)) : null;
+}
+
 export async function createOrder(orderData: Partial<Order>): Promise<Order> {
+  // 1. Idempotency Check: if order with this key already exists, return it immediately (Deduplication)
+  if (orderData.idempotencyKey) {
+    const existing = await getOrderByIdempotencyKey(orderData.idempotencyKey);
+    if (existing) {
+      console.info(`Idempotent order replay: returning existing order ${existing.orderNumber}`);
+      return existing;
+    }
+  }
+
   const db = await connectToDatabase();
 
   const newOrder: Order = {
-    _id: `ord-${Date.now()}`,
+    _id: `ord-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
     orderNumber: orderData.orderNumber || `HA-${Date.now()}`,
     customer: orderData.customer || {
       name: '',
@@ -654,9 +679,20 @@ export async function createOrder(orderData: Partial<Order>): Promise<Order> {
     try {
       const created = await OrderModel.create(newOrder);
       return JSON.parse(JSON.stringify(created));
-    } catch (err) {
+    } catch (err: any) {
+      // If MongoDB threw duplicate key error (race condition on idempotencyKey), return the winning order
+      if (err.code === 11000 && orderData.idempotencyKey) {
+        const raceExisting = await getOrderByIdempotencyKey(orderData.idempotencyKey);
+        if (raceExisting) return raceExisting;
+      }
       console.error('Error creating order in MongoDB:', err);
+      throw new Error('فشل حفظ وتأكيد الطلب في قاعدة البيانات بشكل دائم. يرجى المحاولة مرة أخرى.');
     }
+  }
+
+  // If in production and database is disconnected, fail-safe: NEVER pretend order was saved
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('تعذر الاتصال بقاعدة بيانات المتجر لحفظ الطلب بشكل دائم. لم يتم خصم أي مبالغ، يرجى المحاولة لاحقاً.');
   }
 
   const orders = getMemoryOrders();

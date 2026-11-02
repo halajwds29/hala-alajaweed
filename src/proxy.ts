@@ -19,15 +19,32 @@ async function isValidAdminToken(token: string): Promise<boolean> {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only protect /admin routes — but allow /admin/login freely
+  // 1. Protect Admin UI Routes (/admin) — allow /admin/login freely
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     const token = request.cookies.get(COOKIE_NAME)?.value;
 
     if (!token || !(await isValidAdminToken(token))) {
-      // Redirect unauthenticated users to the login page
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // 2. Protect Admin API Routes (/api/admin) — allow login freely
+  if (pathname.startsWith('/api/admin') && !pathname.startsWith('/api/admin/auth/login')) {
+    const token = request.cookies.get(COOKIE_NAME)?.value;
+    const authHeader = request.headers.get('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+
+    const valid =
+      (token && (await isValidAdminToken(token))) ||
+      (bearerToken && (await isValidAdminToken(bearerToken)));
+
+    if (!valid) {
+      return NextResponse.json(
+        { error: 'غير مصرح لك بالوصول (جلسة غير صالحة أو منتهية)' },
+        { status: 401 }
+      );
     }
   }
 
@@ -38,6 +55,6 @@ export const config = {
   matcher: [
     '/admin',
     '/admin/:path*',
+    '/api/admin/:path*',
   ],
 };
-
