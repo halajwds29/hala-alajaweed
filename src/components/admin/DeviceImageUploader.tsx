@@ -151,51 +151,52 @@ export default function DeviceImageUploader({
 
       {/* Preview Card or Drop Area */}
       {value ? (
-        <div className="p-3 rounded-2xl border border-[#E7DCD0] bg-white shadow-2xs space-y-3">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className={`relative ${aspectClass} w-full rounded-xl overflow-hidden bg-[#FAF6F0] border border-[#E7DCD0] shrink-0`}>
-              <Image
-                src={value}
-                alt={label}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 300px"
-              />
+        <div className="p-3.5 rounded-2xl border border-[#E7DCD0] bg-white shadow-2xs space-y-3 w-full max-w-full min-w-0 overflow-hidden">
+          {/* Framed Image Display */}
+          <div className={`relative ${aspectClass} w-full rounded-xl overflow-hidden bg-[#FAF6F0] border border-[#E7DCD0] mx-auto`}>
+            <Image
+              src={value}
+              alt={label}
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 768px) 100vw, 480px"
+            />
+            {/* Success badge over image */}
+            <div className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-full text-emerald-700 text-[11px] font-bold shadow-xs flex items-center gap-1 border border-emerald-200 pointer-events-none">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>تم تعيين الصورة</span>
             </div>
+          </div>
 
-            <div className="flex-1 space-y-2 text-right w-full">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>تم تعيين الصورة بنجاح</span>
-              </div>
-              <p className="text-[10px] text-[#6E6468] font-mono dir-ltr text-right truncate max-w-xs">
-                {value}
-              </p>
+          {/* Image Path & Action Buttons Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-[#F7F1E9] w-full min-w-0">
+            <p className="text-[10px] text-[#6E6468] font-mono dir-ltr text-right truncate max-w-full sm:max-w-xs" title={value}>
+              {value}
+            </p>
 
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="px-3 py-1.5 rounded-lg bg-[#682D43] hover:bg-[#522234] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs"
-                >
-                  {uploading ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <RefreshCw className="w-3.5 h-3.5" />
-                  )}
-                  <span>تغيير الصورة من الجهاز</span>
-                </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="px-3 py-1.5 rounded-xl bg-[#682D43] hover:bg-[#522234] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs active:scale-95"
+              >
+                {uploading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-3.5 h-3.5" />
+                )}
+                <span>تغيير الصورة من الجهاز</span>
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => onChange('')}
-                  className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition-colors flex items-center gap-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>إزالة</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => onChange('')}
+                className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition-colors flex items-center gap-1 active:scale-95"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>إزالة</span>
+              </button>
             </div>
           </div>
         </div>

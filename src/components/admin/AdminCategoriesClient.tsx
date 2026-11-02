@@ -220,12 +220,12 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
       {/* Modal: Add/Edit Category */}
       {isModalOpen && editingCategory && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-[#E7DCD0] space-y-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-7 shadow-2xl border border-[#E7DCD0] space-y-4 my-8 max-h-[90vh] overflow-y-auto">
             <h2 className="text-base font-bold text-[#4A1D2E] pb-2 border-b border-[#E7DCD0]">
               {editingCategory._id ? 'تعديل بيانات القسم' : 'إضافة قسم جديد'}
             </h2>
 
-            <form onSubmit={handleSave} className="space-y-3 text-xs">
+            <form onSubmit={handleSave} className="space-y-3.5 text-xs">
               <div>
                 <label className="block font-bold text-[#4A1D2E] mb-1">
                   اسم القسم بالعربي <span className="text-rose-600">*</span>
@@ -284,7 +284,7 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                 <div>
                   <label className="block font-bold text-[#4A1D2E] mb-1">
                     ترتيب الظهور
@@ -303,7 +303,7 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
                   />
                 </div>
 
-                <div className="flex items-center gap-2 pt-5">
+                <div className="flex items-center gap-2 sm:pt-6">
                   <input
                     type="checkbox"
                     id="catActive"
@@ -311,9 +311,9 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
                     onChange={(e) =>
                       setEditingCategory({ ...editingCategory, isActive: e.target.checked })
                     }
-                    className="w-4 h-4 accent-[#682D43]"
+                    className="w-4 h-4 accent-[#682D43] rounded cursor-pointer"
                   />
-                  <label htmlFor="catActive" className="font-bold text-[#4A1D2E] cursor-pointer">
+                  <label htmlFor="catActive" className="font-bold text-[#4A1D2E] cursor-pointer select-none">
                     القسم نشط ومعروض
                   </label>
                 </div>
