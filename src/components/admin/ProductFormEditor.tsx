@@ -107,7 +107,9 @@ export default function ProductFormEditor({
         .trim()
         .toLowerCase()
         .replace(/[\s\-_]+/g, '-')
-        .replace(/[^\u0621-\u064A\w-]/g, '');
+        .replace(/[^\u0621-\u064A\w-]/g, '')
+        .replace(/--+/g, '-')
+        .replace(/^-+|-+$/g, '');
       setSlug(generated || `product-${Date.now()}`);
     }
   };
@@ -258,7 +260,14 @@ export default function ProductFormEditor({
       setErrorMessage('اسم المنتج مطلوب.');
       return;
     }
-    if (!slug.trim()) {
+    const sanitizedSlug = slug
+      .trim()
+      .toLowerCase()
+      .replace(/[\s_]+/g, '-')
+      .replace(/--+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    if (!sanitizedSlug) {
       setErrorMessage('رابط Slug التعريفي مطلوب.');
       return;
     }
@@ -272,7 +281,7 @@ export default function ProductFormEditor({
     const payload = {
       name: name.trim(),
       nameEn: nameEn.trim(),
-      slug: slug.trim(),
+      slug: sanitizedSlug,
       categorySlug,
       categoryName: categories.find((c) => c.slug === categorySlug)?.name || '',
       shortDescription: shortDescription.trim(),
@@ -412,8 +421,21 @@ export default function ProductFormEditor({
               placeholder="royal-pistachio-baklava"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
+              onBlur={() => {
+                setSlug((prev) =>
+                  prev
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[\s_]+/g, '-')
+                    .replace(/--+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+                );
+              }}
               className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7DCD0] text-xs bg-[#FAF6F0] font-mono dir-ltr text-right focus:outline-none focus:border-[#682D43]"
             />
+            <p className="text-[10px] text-[#9F6A76] mt-1">
+              يُستخدم كرابط لصفحة المنتج (يُفضل كتابته بالأحرف الإنجليزية أو بدون مسافات).
+            </p>
           </div>
 
           <div>

@@ -12,7 +12,13 @@ interface CategoryPageProps {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  let decoded = slug;
+  try {
+    decoded = decodeURIComponent(slug);
+  } catch {
+    // Ignore
+  }
+  const category = (await getCategoryBySlug(decoded)) || (await getCategoryBySlug(slug));
   if (!category) return { title: 'القسم غير موجود' };
 
   return {
@@ -23,8 +29,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
+  let decoded = slug;
+  try {
+    decoded = decodeURIComponent(slug);
+  } catch {
+    // Ignore
+  }
   const [category, allCategories, allProducts] = await Promise.all([
-    getCategoryBySlug(slug),
+    getCategoryBySlug(decoded),
     getCategories(),
     getProducts(),
   ]);
@@ -33,7 +45,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const categoryProducts = allProducts.filter((p) => p.categorySlug === slug);
+  const categoryProducts = allProducts.filter(
+    (p) =>
+      p.categorySlug === category.slug ||
+      p.categorySlug === decoded ||
+      p.categorySlug === slug
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8 w-full max-w-full min-w-0">

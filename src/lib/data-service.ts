@@ -189,18 +189,86 @@ export async function getAllCategoriesAdmin(): Promise<Category[]> {
   return [...getMemoryCategories()].sort((a, b) => a.sortOrder - b.sortOrder).map(normalizeCategoryPhotos);
 }
 
+export function sanitizeSlug(val?: string): string {
+  if (!val) return '';
+  return val
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-')
+    .replace(/--+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function getSlugVariants(raw: string): string[] {
+  if (!raw) return [];
+  const trimmed = raw.trim();
+  let decoded = trimmed;
+  try {
+    decoded = decodeURIComponent(trimmed);
+  } catch {
+    // Ignore malformed URI
+  }
+  let encoded = trimmed;
+  try {
+    encoded = encodeURIComponent(decoded);
+  } catch {
+    // Ignore
+  }
+
+  const spaceFromDash = decoded.replace(/-/g, ' ');
+  const dashFromSpace = decoded.replace(/[\s_]+/g, '-');
+  const sanitized = sanitizeSlug(decoded);
+
+  const set = new Set<string>([
+    trimmed,
+    decoded,
+    encoded,
+    spaceFromDash,
+    dashFromSpace,
+    sanitized,
+    trimmed.toLowerCase(),
+    decoded.toLowerCase(),
+    spaceFromDash.toLowerCase(),
+    dashFromSpace.toLowerCase(),
+  ]);
+
+  return Array.from(set).filter(Boolean);
+}
+
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
   const db = await connectToDatabase();
+  const variants = getSlugVariants(slug);
+  if (variants.length === 0) return null;
+
   if (db.isConnected) {
     try {
       await initMongoSeedIfNeeded();
-      const cat = await CategoryModel.findOne({ slug }).lean();
-      return cat ? normalizeCategoryPhotos(JSON.parse(JSON.stringify(cat))) : null;
+      const cat = await CategoryModel.findOne({
+        $or: [
+          { slug: { $in: variants } },
+          { _id: { $in: variants } },
+        ],
+      }).lean();
+      if (cat) return normalizeCategoryPhotos(JSON.parse(JSON.stringify(cat)));
+
+      const primary = variants[0];
+      const escaped = primary.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const fallbackCat = await CategoryModel.findOne({
+        slug: { $regex: new RegExp(`^${escaped}$`, 'i') },
+      }).lean();
+      if (fallbackCat) {
+        return normalizeCategoryPhotos(JSON.parse(JSON.stringify(fallbackCat)));
+      }
     } catch (err) {
       console.error('Error fetching category by slug from MongoDB:', err);
     }
   }
-  const found = getMemoryCategories().find((c) => c.slug === slug);
+  const found = getMemoryCategories().find(
+    (c) =>
+      variants.includes(c.slug) ||
+      variants.includes(c._id) ||
+      variants.some((v) => v.toLowerCase() === (c.slug || '').toLowerCase())
+  );
   return found ? normalizeCategoryPhotos(found) : null;
 }
 
@@ -366,16 +434,42 @@ export async function getAllProductsAdmin(): Promise<Product[]> {
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const db = await connectToDatabase();
+  const variants = getSlugVariants(slug);
+  if (variants.length === 0) return null;
+
   if (db.isConnected) {
     try {
       await initMongoSeedIfNeeded();
-      const prod = await ProductModel.findOne({ slug }).lean();
-      return prod ? normalizeProductPhotos(JSON.parse(JSON.stringify(prod))) : null;
+      const prod = await ProductModel.findOne({
+        $or: [
+          { slug: { $in: variants } },
+          { _id: { $in: variants } },
+        ],
+      }).lean();
+      if (prod) {
+        return normalizeProductPhotos(JSON.parse(JSON.stringify(prod)));
+      }
+
+      // Regex fallback for case-insensitive or hyphen-relaxed match
+      const primary = variants[0];
+      const escaped = primary.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const fallbackProd = await ProductModel.findOne({
+        slug: { $regex: new RegExp(`^${escaped}$`, 'i') },
+      }).lean();
+      if (fallbackProd) {
+        return normalizeProductPhotos(JSON.parse(JSON.stringify(fallbackProd)));
+      }
     } catch (err) {
       console.error('Error fetching product by slug from MongoDB:', err);
     }
   }
-  const found = getMemoryProducts().find((p) => p.slug === slug);
+
+  const found = getMemoryProducts().find(
+    (p) =>
+      variants.includes(p.slug) ||
+      variants.includes(p._id) ||
+      variants.some((v) => v.toLowerCase() === (p.slug || '').toLowerCase())
+  );
   return found ? normalizeProductPhotos(found) : null;
 }
 
@@ -397,6 +491,10 @@ export async function getProductById(id: string): Promise<Product | null> {
 export async function updateProduct(
   product: Partial<Product> & { _id: string }
 ): Promise<Product | null> {
+  if (product.slug) {
+    product.slug = sanitizeSlug(product.slug);
+  }
+
   const db = await connectToDatabase();
   if (db.isConnected) {
     try {
@@ -421,11 +519,12 @@ export async function updateProduct(
 
 export async function createProduct(product: Partial<Product>): Promise<Product> {
   const db = await connectToDatabase();
+  const cleanSlug = sanitizeSlug(product.slug) || `prod-${Date.now()}`;
   const newProd: Product = {
     _id: `prod-${Date.now()}`,
     name: product.name || '',
     nameEn: product.nameEn,
-    slug: product.slug || `prod-${Date.now()}`,
+    slug: cleanSlug,
     shortDescription: product.shortDescription || '',
     description: product.description || '',
     categorySlug: product.categorySlug || 'eastern-sweets-baklava',

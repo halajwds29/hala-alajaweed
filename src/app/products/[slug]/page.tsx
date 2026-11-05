@@ -13,7 +13,13 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  let decoded = slug;
+  try {
+    decoded = decodeURIComponent(slug);
+  } catch {
+    // Ignore
+  }
+  const product = (await getProductBySlug(decoded)) || (await getProductBySlug(slug));
   if (!product) return { title: 'المنتج غير موجود' };
 
   const primaryImage = product.images[0]?.url;
@@ -31,7 +37,13 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  let decoded = slug;
+  try {
+    decoded = decodeURIComponent(slug);
+  } catch {
+    // Ignore
+  }
+  const product = (await getProductBySlug(decoded)) || (await getProductBySlug(slug));
 
   if (!product) {
     notFound();
