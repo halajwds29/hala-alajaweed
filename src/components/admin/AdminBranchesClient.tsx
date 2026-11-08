@@ -54,13 +54,15 @@ export default function AdminBranchesClient({ initialBranches }: AdminBranchesCl
 
       const savedBranch: Branch = data.branch;
       setBranches((prev) => {
-        const idx = prev.findIndex((b) => b._id === savedBranch._id);
-        if (idx !== -1) {
-          const copy = [...prev];
-          copy[idx] = savedBranch;
-          return copy;
+        const next = prev.map((b) => {
+          if (b._id === savedBranch._id) return savedBranch;
+          if (savedBranch.isHQ) return { ...b, isHQ: false };
+          return b;
+        });
+        if (!next.some((b) => b._id === savedBranch._id)) {
+          next.push(savedBranch);
         }
-        return [...prev, savedBranch];
+        return next;
       });
 
       setIsModalOpen(false);

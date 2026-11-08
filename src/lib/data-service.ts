@@ -326,7 +326,8 @@ export async function createCategory(category: Partial<Category>): Promise<Categ
 }
 
 export async function saveCategory(category: Partial<Category>): Promise<Category> {
-  if (category._id && category._id.length > 3) {
+  const categoryId = category._id ? String(category._id).trim() : '';
+  if (categoryId) {
     const updated = await updateCategory(category as Partial<Category> & { _id: string });
     if (updated) return updated;
   }
@@ -559,7 +560,8 @@ export async function createProduct(product: Partial<Product>): Promise<Product>
 }
 
 export async function saveProduct(product: Partial<Product>): Promise<Product> {
-  if (product._id && product._id.length > 3) {
+  const productId = product._id ? String(product._id).trim() : '';
+  if (productId) {
     const updated = await updateProduct(product as Partial<Product> & { _id: string });
     if (updated) return updated;
   }
@@ -855,21 +857,63 @@ export async function getBranches(onlyActive = true): Promise<Branch[]> {
 
 export async function saveBranch(branch: Partial<Branch>): Promise<Branch> {
   const db = await connectToDatabase();
+  const branchId = branch._id ? String(branch._id).trim() : '';
+
   if (db.isConnected) {
-    if (branch._id && branch._id.length > 10) {
-      const updated = await BranchModel.findByIdAndUpdate(branch._id, branch, {
-        new: true,
-      }).lean();
-      if (updated) return JSON.parse(JSON.stringify(updated));
-    } else {
-      const created = await BranchModel.create(branch);
+    try {
+      await initMongoSeedIfNeeded();
+
+      // If designated as HQ, clear HQ flag from other branches
+      if (branch.isHQ) {
+        await BranchModel.updateMany(
+          branchId ? { _id: { $ne: branchId } } : {},
+          { $set: { isHQ: false } }
+        );
+      }
+
+      if (branchId) {
+        const updated = await BranchModel.findByIdAndUpdate(
+          branchId,
+          { $set: branch },
+          { new: true, upsert: false }
+        ).lean();
+        if (updated) {
+          return JSON.parse(JSON.stringify(updated));
+        }
+      }
+
+      // If no ID or not found in DB, create new branch
+      const newId = branchId || `branch-${Date.now()}`;
+      const toCreate: Branch = {
+        _id: newId,
+        name: branch.name || 'فرع جديد',
+        city: branch.city || 'حائل',
+        district: branch.district || '',
+        address: branch.address || '',
+        mapUrl: branch.mapUrl || '',
+        phone: branch.phone || '+966546002435',
+        workingHours: branch.workingHours || 'من 9:00 ص إلى 11:30 م',
+        isActive: branch.isActive !== undefined ? branch.isActive : true,
+        isHQ: branch.isHQ || false,
+        serviceAreas: branch.serviceAreas || [],
+      };
+      const created = await BranchModel.create(toCreate);
       return JSON.parse(JSON.stringify(created));
+    } catch (err) {
+      console.error('Error saving branch in MongoDB:', err);
+      throw err;
     }
   }
 
   const branches = getMemoryBranches();
-  if (branch._id) {
-    const idx = branches.findIndex((b) => b._id === branch._id);
+  if (branch.isHQ) {
+    branches.forEach((b) => {
+      if (b._id !== branchId) b.isHQ = false;
+    });
+  }
+
+  if (branchId) {
+    const idx = branches.findIndex((b) => b._id === branchId);
     if (idx !== -1) {
       branches[idx] = { ...branches[idx], ...branch } as Branch;
       setMemoryBranches(branches);
@@ -878,7 +922,7 @@ export async function saveBranch(branch: Partial<Branch>): Promise<Branch> {
   }
 
   const newBranch: Branch = {
-    _id: `branch-${Date.now()}`,
+    _id: branchId || `branch-${Date.now()}`,
     name: branch.name || 'فرع جديد',
     city: branch.city || 'حائل',
     district: branch.district || '',
