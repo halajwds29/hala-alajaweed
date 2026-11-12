@@ -45,13 +45,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const categoryProducts = allProducts.filter(
-    (p) =>
-      p.categorySlug === category.slug ||
-      p.categorySlug === decoded ||
-      p.categorySlug === slug
-  );
-
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8 w-full max-w-full min-w-0">
       {/* Breadcrumb */}
@@ -81,9 +74,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
       {/* Filter and Products List */}
       <ProductsFilterView
-        initialProducts={categoryProducts}
+        initialProducts={allProducts}
         categories={allCategories}
-        initialCategorySlug={slug}
+        initialCategorySlug={category.slug}
       />
     </div>
   );

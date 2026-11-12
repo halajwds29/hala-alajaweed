@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Product, Category } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import { Search, SlidersHorizontal, Store, LayoutGrid, Rows3 } from 'lucide-react';
@@ -24,10 +24,18 @@ export default function ProductsFilterView({
   const [onlyWholesale, setOnlyWholesale] = useState(initialOnlyWholesale);
   const [mobileColumns, setMobileColumns] = useState<'1' | '2'>('2');
 
+  // Sync selectedCategory whenever the prop changes (e.g. navigation across category routes)
+  useEffect(() => {
+    setSelectedCategory(initialCategorySlug);
+  }, [initialCategorySlug]);
+
   const filteredProducts = useMemo(() => {
     return initialProducts.filter((product) => {
-      // Category filter
-      if (selectedCategory !== 'all' && product.categorySlug !== selectedCategory) {
+      // Category filter (safe trim comparison)
+      if (
+        selectedCategory !== 'all' &&
+        (product.categorySlug || '').trim() !== (selectedCategory || '').trim()
+      ) {
         return false;
       }
       // Wholesale filter
@@ -107,7 +115,12 @@ export default function ProductsFilterView({
         <div className="w-full max-w-full min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar w-full max-w-full touch-pan-x">
             <button
-              onClick={() => setSelectedCategory('all')}
+              onClick={() => {
+                setSelectedCategory('all');
+                if (typeof window !== 'undefined') {
+                  window.history.replaceState(null, '', '/products');
+                }
+              }}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors shrink-0 ${
                 selectedCategory === 'all'
                   ? 'bg-[#682D43] text-white shadow-xs'
@@ -117,12 +130,19 @@ export default function ProductsFilterView({
               جميع الأقسام ({initialProducts.length})
             </button>
             {categories.map((cat) => {
-              const count = initialProducts.filter((p) => p.categorySlug === cat.slug).length;
-              const isSelected = selectedCategory === cat.slug;
+              const count = initialProducts.filter(
+                (p) => (p.categorySlug || '').trim() === cat.slug.trim()
+              ).length;
+              const isSelected = (selectedCategory || '').trim() === cat.slug.trim();
               return (
                 <button
                   key={cat.slug}
-                  onClick={() => setSelectedCategory(cat.slug)}
+                  onClick={() => {
+                    setSelectedCategory(cat.slug);
+                    if (typeof window !== 'undefined') {
+                      window.history.replaceState(null, '', `/categories/${cat.slug}`);
+                    }
+                  }}
                   className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors shrink-0 ${
                     isSelected
                       ? 'bg-[#682D43] text-white shadow-xs'
