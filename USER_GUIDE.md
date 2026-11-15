@@ -490,3 +490,4 @@ Live performance dashboard providing:
 
 *صُمم وطُوّر لمؤسسة حلا الأجاويد للحلويات — حائل، المملكة العربية السعودية.*  
 *Designed & Developed for Hala Al-Ajaweed Sweets & Pastries — Hail, Kingdom of Saudi Arabia.*
+
